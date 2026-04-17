@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sarah J. · The Academic Atelier — Dashboard</title>
+<!-- Google Fonts + Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/profile.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<header class="navbar">
+  <div class="container">
+    <div class="logo">STUDY HUB</div>
+    <nav class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Features</a>
+      <a href="#">About Us</a>
+      <a href="#">Contact Us</a>
+      <a href="#" class="active">Study Resources</a>
+    </nav>
+    <button class="login-btn" id="loginBtn">Login</button>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div>
+        <div class="badge">DIGITAL SANCTUARY DASHBOARD</div>
+        <h1 class="main-title">Welcome back, <br/>Sarah J.</h1>
+      </div>
+      <div class="focus-card">
+        <div>
+          <p style="font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant);">Current Focus Session</p>
+          <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">Organic Chemistry</p>
+          <div class="focus-timer">
+            <span class="material-symbols-outlined" style="font-size: 1rem;">timer</span>
+            <span id="focusTimerDisplay" style="font-family: monospace; font-weight: bold;">00:42:15</span>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <div class="avatar">
+            <img src="https://images.pexels.com/photos/3810791/pexels-photo-3810791.jpeg?auto=compress&cs=tinysrgb&w=160&h=160&fit=crop" alt="Sarah J. profile portrait">
+          </div>
+          <div class="edit-badge">
+            <span class="material-symbols-outlined" style="color: white; font-size: 0.875rem;">edit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Study Dashboard (Bar Chart) -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <div>
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">Weekly Study Dashboard</h2>
+          <p style="color: var(--on-surface-variant);">Focus intensity over the last 7 days</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-outline" id="exportBtn">Export PDF</button>
+          <button class="btn-primary" id="trendsBtn">View Trends</button>
+        </div>
+      </div>
+      <div class="bars-wrapper">
+        <!-- Hours: Mon 2.6, Tue 4.5, Wed 5.6, Thu 3.4, Fri 3.2, Sat 1.8, Sun 4.8 -->
+        <div class="bar-item"><div class="bar" style="height: 78px;"></div><span class="bar-label">Mon</span><span class="bar-hours">2.6h</span></div>
+        <div class="bar-item"><div class="bar" style="height: 135px;"></div><span class="bar-label">Tue</span><span class="bar-hours">4.5h</span></div>
+        <div class="bar-item"><div class="bar highlight" style="height: 168px;"></div><span class="bar-label" style="color: var(--primary); font-weight: bold;">Wed</span><span class="bar-hours">5.6h</span></div>
+        <div class="bar-item"><div class="bar" style="height: 102px;"></div><span class="bar-label">Thu</span><span class="bar-hours">3.4h</span></div>
+        <div class="bar-item"><div class="bar" style="height: 96px;"></div><span class="bar-label">Fri</span><span class="bar-hours">3.2h</span></div>
+        <div class="bar-item"><div class="bar" style="height: 54px;"></div><span class="bar-label">Sat</span><span class="bar-hours">1.8h</span></div>
+        <div class="bar-item"><div class="bar" style="height: 144px;"></div><span class="bar-label">Sun</span><span class="bar-hours">4.8h</span></div>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.7rem; color: var(--outline);">
+        <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: var(--primary); border-radius: 2px;"></span> Peak day (Wednesday)</span>
+        <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: var(--surface-container-highest); border-radius: 2px;"></span> Study hours</span>
+      </div>
+    </div>
+
+    <!-- MY NOTEBOOKS Grid -->
+    <div class="section-header">
+      <h2 style="font-size: 1.875rem; font-weight: 800; color: var(--primary);">MY NOTEBOOKS</h2>
+      <button id="viewAllBtn" style="display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--primary); font-weight: 500; cursor: pointer;">View All <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_forward</span></button>
+    </div>
+
+    <div class="notebooks-grid">
+      <!-- Biology Card -->
+      <div class="notebook-card" data-notebook="Biology">
+        <div class="card-accent" style="background: var(--tertiary);"></div>
+        <div class="card-content">
+          <div class="card-icon"><span class="material-symbols-outlined" style="color: var(--tertiary);">biotech</span></div>
+          <h3 class="card-title">Biology</h3>
+          <p class="card-desc">Cellular metabolism, DNA replication, and molecular genetics synthesis.</p>
+          <div class="card-meta">
+            <div class="avatar-stack"><div>12</div><div style="background: var(--secondary-light);">PDF</div></div>
+            <span style="font-size: 0.75rem;">42 Active Notes</span>
+          </div>
+        </div>
+        <div class="card-footer"><span style="font-weight: bold; font-size: 0.7rem;">Open Notebook</span><span class="material-symbols-outlined" style="font-size: 1rem;">chevron_right</span></div>
+      </div>
+
+      <!-- Calculus III Card -->
+      <div class="notebook-card" data-notebook="Calculus III">
+        <div class="card-accent" style="background: var(--secondary);"></div>
+        <div class="card-content">
+          <div class="card-icon"><span class="material-symbols-outlined" style="color: var(--secondary);">functions</span></div>
+          <h3 class="card-title">Calculus III</h3>
+          <p class="card-desc">Multi-variable functions, partial derivatives, and line integrals.</p>
+          <div class="card-meta">
+            <div class="avatar-stack"><div>8</div><div style="background: var(--primary-fixed-dim);">IMG</div></div>
+            <span style="font-size: 0.75rem;">28 Active Notes</span>
+          </div>
+        </div>
+        <div class="card-footer"><span style="font-weight: bold; font-size: 0.7rem;">Open Notebook</span><span class="material-symbols-outlined" style="font-size: 1rem;">chevron_right</span></div>
+      </div>
+
+      <!-- Modern History Card -->
+      <div class="notebook-card" data-notebook="Modern History">
+        <div class="card-accent" style="background: var(--on-primary-container);"></div>
+        <div class="card-content">
+          <div class="card-icon"><span class="material-symbols-outlined" style="color: var(--on-primary-container);">history_edu</span></div>
+          <h3 class="card-title">Modern History</h3>
+          <p class="card-desc">Analysis of post-industrial revolutions and global shift dynamics.</p>
+          <div class="card-meta">
+            <div class="avatar-stack"><div>15</div><div style="background: var(--tertiary-light);">DOC</div></div>
+            <span style="font-size: 0.75rem;">56 Active Notes</span>
+          </div>
+        </div>
+        <div class="card-footer"><span style="font-weight: bold; font-size: 0.7rem;">Open Notebook</span><span class="material-symbols-outlined" style="font-size: 1rem;">chevron_right</span></div>
+      </div>
+
+      <!-- New Subject Placeholder -->
+      <div class="new-card" id="newSubjectBtn">
+        <div class="add-icon"><span class="material-symbols-outlined" style="font-size: 2rem;">add</span></div>
+        <h3 style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">New Subject</h3>
+        <p style="color: var(--on-surface-variant); font-size: 0.875rem; margin-top: 8px;">Add a new academic sanctuary</p>
+      </div>
+    </div>
+
+    
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div>
+      <p style="font-weight: bold; font-family: 'Manrope', sans-serif; margin-bottom: 4px;">The Academic Atelier</p>
+      <p style="font-size: 0.75rem; color: var(--on-surface-variant);">© 2025 The Academic Atelier — A Digital Sanctuary for Focus.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/profile.js"></script>
+</body>
+</html>
