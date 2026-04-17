@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+<body>
+
+<div class="login-container">
+<div class="login-card">
+
+<div class="login-header">
+    <h2>Login</h2>
+    <p>Welcome back</p>
+</div>
+
+<form id="loginForm">
+
+<div class="form-group">
+    <div class="input-wrapper">
+        <input type="email" id="loginEmail">
+        <label>Email</label>
+    </div>
+    <div class="error-text" id="loginEmailError"></div>
+</div>
+
+<div class="form-group">
+    <div class="input-wrapper">
+        <input type="password" id="loginPassword">
+        <label>Password</label>
+    </div>
+    <div class="error-text" id="loginPasswordError"></div>
+</div>
+
+<button class="login-btn" type="submit">Login</button>
+
+</form>
+
+<div class="signup-link">
+<p>Don't have account? <a href="signup.html">Create one</a></p>
+</div>
+
+</div>
+</div>
+
+<script src="../assets/js/validation.js"></script>
+</body>
+</html>
