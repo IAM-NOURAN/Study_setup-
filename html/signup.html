@@ -8,62 +8,62 @@
 <body>
 
 <div class="login-container">
-<div class="login-card">
+    <div class="login-card">
 
-<div class="login-header">
-    <h2>Create Account</h2>
-    <p>Sign up to get started</p>
-</div>
+        <div class="login-header">
+            <h2>Create Account</h2>
+            <p>Sign up to get started</p>
+        </div>
 
-<form id="registerForm">
+        <form id="registerForm">
 
-<!-- Name -->
-<div class="form-group">
-    <div class="input-wrapper">
-        <input type="text" id="username">
-        <label>Full Name</label>
+            <!-- Name -->
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="text" id="username" >
+                    <label for="username">Full Name</label>
+                </div>
+                <div class="error-text" id="usernameError"></div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="email" id="email" >
+                    <label for="email">Email</label>
+                </div>
+                <div class="error-text" id="emailError"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="password" id="password" >
+                    <label for="password">Password</label>
+                </div>
+                <div class="error-text" id="passwordError"></div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="password" id="confirm_password" >
+                    <label for="confirm_password">Confirm Password</label>
+                </div>
+                <div class="error-text" id="confirmError"></div>
+            </div>
+
+            <button class="login-btn" type="submit">Sign Up</button>
+
+        </form>
+
+        <div class="signup-link">
+            <p>Already have an account? <a href="login.html">Sign In</a></p>
+        </div>
+
     </div>
-    <div class="error-text" id="usernameError"></div>
 </div>
 
-<!-- Email -->
-<div class="form-group">
-    <div class="input-wrapper">
-        <input type="email" id="email">
-        <label>Email</label>
-    </div>
-    <div class="error-text" id="emailError"></div>
-</div>
-
-<!-- Password -->
-<div class="form-group">
-    <div class="input-wrapper">
-        <input type="password" id="password">
-        <label>Password</label>
-    </div>
-    <div class="error-text" id="passwordError"></div>
-</div>
-
-<!-- Confirm -->
-<div class="form-group">
-    <div class="input-wrapper">
-        <input type="password" id="confirm_password">
-        <label>Confirm Password</label>
-    </div>
-    <div class="error-text" id="confirmError"></div>
-</div>
-
-<button class="login-btn" type="submit">Sign Up</button>
-
-</form>
-
-<div class="signup-link">
-<p>Already have an account? <a href="login.html">Sign In</a></p>
-</div>
-
-</div>
-</div>
-
-<script src="../js/validation.js"></script>
+<script src="../assets/js/signupValidation.js"></script>
 </body>
 </html>

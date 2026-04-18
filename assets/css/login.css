@@ -6,6 +6,7 @@
     --sand: #E5E1DD;
 }
 
+
 * {
     margin: 0;
     padding: 0;
@@ -72,11 +73,11 @@ body {
 }
 
 .input-wrapper input {
-    border: 1px solid var(--teal);
-    background: var(--sand);
-    color: var(--navy);
+    background: #ffffff;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
     padding: 12px 16px;
+    color: #1a202c;
     font-size: 16px;
     font-weight: 400;
     transition: all 0.2s ease;
@@ -85,8 +86,8 @@ body {
 }
 
 .input-wrapper input:focus {
-    border-color: var(--navy);
-    box-shadow: 0 0 0 3px rgba(192, 213, 214, 0.6);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold);
 }
 
 .input-wrapper input:focus + label,
@@ -100,13 +101,13 @@ body {
     position: absolute;
     left: 16px;
     top: 12px;
-    color: var(--teal);
+    color: var(--gold);
     font-size: 16px;
     font-weight: 400;
     transition: all 0.2s ease;
     pointer-events: none;
     transform-origin: left top;
-    /* background: #ffffff; */
+    background: #ffffff;
     padding: 0 4px;
 }
 
@@ -126,7 +127,7 @@ body {
 }
 
 .input-wrapper .password-toggle:hover {
-    color: #3b82f6;
+    color: var(--gold);
 }
 
 .toggle-icon {
@@ -183,8 +184,8 @@ body {
 }
 
 .remember-wrapper input[type="checkbox"]:checked + .checkbox-label .checkmark {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: var(--navy);
+    border-color: var(--navy);
 }
 
 .remember-wrapper input[type="checkbox"]:checked + .checkbox-label .checkmark::after {
@@ -195,7 +196,7 @@ body {
 }
 
 .checkbox-label {
-    color: #4a5568;
+    color: var(--teal);
     font-size: 14px;
     cursor: pointer;
     user-select: none;
@@ -205,29 +206,25 @@ body {
 }
 
 .forgot-password {
+    color: var(--gold);
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     transition: color 0.2s ease;
 }
-.forgot-password,
-.signup-link a {
-    color: var(--teal);
-}
 
-.forgot-password:hover,
-.signup-link a:hover {
-    color: var(--gold);
+.forgot-password:hover {
+    color: var(--navy);
 }
 
 /* Login Button */
 .login-btn {
     width: 100%;
-    background: var(--navy);
-    color: var(--sand);
+    background: var(--gold);
     border: none;
     border-radius: 6px;
     padding: 12px 24px;
+    color: white;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -237,7 +234,7 @@ body {
 }
 
 .login-btn:hover {
-    background: #062f3f;
+    background: var(--navy);
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
 }
@@ -347,19 +344,19 @@ body {
 }
 
 .signup-link p {
-    color: #718096;
+    color: var(--teal);
     font-size: 14px;
 }
 
 .signup-link a {
-    color: var(--teal);
+    color: var(--gold);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s ease;
 }
 
 .signup-link a:hover {
-    color: var(--gold);
+    color: var(--navy);
 }
 
 /* Animations */
