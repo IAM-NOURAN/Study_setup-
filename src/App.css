@@ -1,0 +1,24 @@
+:root {
+    /* Colors */
+    --primary: #002433;
+    --primary-container: #083a4f;
+    --secondary: #705b38;
+    --secondary-container: #fbdfb2;
+    --on-secondary-container: #76613e;
+    --tertiary: #00252c;
+    --surface: #fdf9f4;
+    --on-surface: #1c1b19;
+    --surface-container-low: #f7f3ef;
+    --surface-container: #f1ede9;
+    --surface-container-highest: #e6e2de;
+    --on-surface-variant: #41484c;
+    --amber-200: #fde68a; /* Used in header */
+    
+    /* Gradients & Shadows */
+    --hero-gradient: linear-gradient(135deg, #002433 0%, #083a4f 100%);
+    --editorial-shadow: 0 32px 64px -12px rgba(28, 27, 25, 0.06);
+
+    /* Typography */
+    --font-headline: 'Manrope', sans-serif;
+    --font-body: 'Work Sans', sans-serif;
+}

@@ -18,7 +18,7 @@ function Home() {
             <a href="#features-section" className="nav-link">Features</a>
             <a href="#about-section" className="nav-link">About Us</a>
             <a href="#contact-section" className="nav-link">Contact Us</a>
-            <a href="#" className="nav-link">Study Resources</a>
+            <Link to="/tasks" className="nav-link">Study Resources</Link>
           </nav>
 
           <div id="header-actions" className="d-flex align-items-center gap-3">

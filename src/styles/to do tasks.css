@@ -1,0 +1,185 @@
+*{
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    text-transform: capitalize;
+    box-sizing: border-box;
+}
+:root {
+    /* Colors */
+    --primary: #002433;
+    --primary-container: #083a4f;
+    --secondary: #705b38;
+    --secondary-container: #fbdfb2;
+    --on-secondary-container: #76613e;
+    --tertiary: #00252c;
+    --surface: #fdf9f4;
+    --on-surface: #1c1b19;
+    --surface-container-low: #f7f3ef;
+    --surface-container: #f1ede9;
+    --surface-container-highest: #e6e2de;
+    --on-surface-variant: #41484c;
+    --amber-200: #fde68a; /* Used in header */
+    
+    /* Gradients & Shadows */
+    --hero-gradient: linear-gradient(135deg, #002433 0%, #083a4f 100%);
+    --editorial-shadow: 0 32px 64px -12px rgba(28, 27, 25, 0.06);
+
+    /* Typography */
+    --font-headline: 'Manrope', sans-serif;
+    --font-body: 'Work Sans', sans-serif;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+}
+
+/* عناوين الصفحة الرئيسية */
+.sub-title {
+  color: var(--secondary);
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+.main-title {
+  font-size: 2.75rem;
+  color: var(--primary);
+  font-family: var(--font-headline);
+  font-weight: 700;
+}
+
+.description-text {
+  color: var(--on-surface-variant);
+  max-width: 550px;
+}
+
+/* Aside */
+.focus-card, .reading-card, .tasks-container {
+  background-color: var(--surface-container-low);
+  border-radius: 8px;
+  border: 1px solid var(--surface-container-highest);
+  box-shadow: var(--editorial-shadow);
+}
+
+.card-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-headline);
+}
+
+/* 65  */
+.percentage-box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--secondary-container);
+  border: 1px solid var(--amber-200);
+  border-radius: 6px;
+  color: var(--on-secondary-container);
+  font-weight: bold;
+  font-size: 1.15rem;
+  font-family: var(--font-headline);
+}
+
+/* timer*/
+.timer-badge {
+  background-color: var(--surface-container);
+  border-radius: 4px;
+  display: inline-flex;
+  color: var(--on-surface-variant);
+}
+
+.small-icon { font-size: 1.1rem !important; }
+.small-text { font-size: 0.85rem; }
+
+/* reading list */
+.bullet-square {
+  width: 8px;
+  height: 8px;
+  background-color: #93c5fd; /**/
+  display: inline-block;
+}
+
+.list-text {
+  font-size: 0.9rem;
+  color: var(--on-surface-variant);
+}
+
+/*  buttons */
+.add-task-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  transition: opacity 0.2s;
+}
+.add-task-btn:hover { opacity: 0.7; }
+
+
+.task-row {
+  background-color: var(--surface-container);
+  border-radius: 6px;
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+}
+
+
+.active-task {
+  border-left-color: var(--primary);
+  background-color: var(--surface-container-highest);
+}
+
+/**/
+.completed-task {
+  opacity: 0.6;
+}
+
+.task-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-headline);
+}
+.task-desc { 
+  font-size: 0.85rem; 
+  color: var(--on-surface-variant);
+}
+
+/**/
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--surface-container-highest);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+.custom-checkbox.checked {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--surface);
+}
+.check-icon { font-size: 0.9rem !important; font-weight: bold; }
+
+/* Placeholder Row */
+.task-placeholder {
+  border: 2px dashed var(--surface-container-highest);
+  border-radius: 6px;
+  background: transparent;
+}
+.placeholder-icon { color: var(--on-surface-variant); }
+
+/* Hero Gradient  */
+.quote-banner {
+  background: var(--hero-gradient);
+  min-height: 150px;
+  border-radius: 8px;
+  box-shadow: var(--editorial-shadow);
+}
+.quote-content cite {
+  color: var(--secondary-container) ;
+}
