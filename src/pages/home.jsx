@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import '../styles/home.css'; 
 
 function Home() {
+  
   return (
     <>
       <header id="main-header" className="site-header sticky-top">

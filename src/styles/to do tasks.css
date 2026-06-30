@@ -183,3 +183,41 @@ body {
 .quote-content cite {
   color: var(--secondary-container) ;
 }
+/* Custom Modal */
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /*backdrop filter*/
+  z-index: 2000;
+  backdrop-filter: blur(4px); /* make the backdrop blurry */
+}
+
+.custom-modal-content {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-container-highest);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  animation: fadeInModal 0.25s ease-out;
+}
+
+.custom-modal-content .form-control {
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+.custom-modal-content .form-control:focus {
+  background-color: var(--surface);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+@keyframes fadeInModal {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
