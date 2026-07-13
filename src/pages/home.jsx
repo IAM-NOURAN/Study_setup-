@@ -20,6 +20,7 @@ function Home() {
             <a href="#about-section" className="nav-link">About Us</a>
             <a href="#contact-section" className="nav-link">Contact Us</a>
             <Link to="/tasks" className="nav-link">Study Resources</Link>
+            <Link to="/profile" className="nav-link">My Profile</Link>
           </nav>
 
           <div id="header-actions" className="d-flex align-items-center gap-3">
