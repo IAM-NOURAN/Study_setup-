@@ -2,9 +2,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/home.css'; 
+import { useAuth } from '../context/AuthContext';
 
 function Home() {
-  
+  const { isLoggedIn } = useAuth();
+
   return (
     <>
       <header id="main-header" className="site-header sticky-top">
@@ -24,7 +26,9 @@ function Home() {
           </nav>
 
           <div id="header-actions" className="d-flex align-items-center gap-3">
-            <button id="login-btn" className="btn-login font-headline">Login</button>
+            <Link to="/login" id="login-btn" className="btn-login font-headline text-decoration-none d-inline-flex align-items-center justify-content-center">
+              Login
+            </Link>
             <button id="mobile-menu-btn" className="btn-mobile-menu d-md-none">
               <span className="material-symbols-outlined">menu</span>
             </button>
@@ -54,9 +58,13 @@ function Home() {
                   Transform your study routine into a curated academic ritual. Experience a digital sanctuary designed for deep focus and structural excellence.
                 </p>
                 <div id="hero-buttons" className="d-flex flex-column flex-sm-row gap-3">
-                  <button id="btn-get-started" className="btn-primary-gradient d-flex align-items-center justify-content-center gap-2">
-                    GET STARTED NOW <span className="material-symbols-outlined">arrow_forward</span>
-                  </button>
+                  <Link 
+                    to={isLoggedIn ? "/tasks" : "/Signup"} 
+                   id="btn-get-started" 
+                   className="btn-primary-gradient d-flex align-items-center justify-content-center gap-2 text-decoration-none"
+                       >
+                      GET STARTED NOW <span className="material-symbols-outlined">arrow_forward</span>
+                      </Link>
                   <button id="btn-view-method" className="btn-secondary-outline">
                     VIEW METHODOLOGY
                   </button>
