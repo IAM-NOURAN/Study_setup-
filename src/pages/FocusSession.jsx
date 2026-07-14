@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Play,
@@ -7,23 +7,59 @@ import {
   Plus,
   GripVertical,
   Calendar,
-  Volume2,
   Palette,
   Settings,
   Maximize2,
   Archive,
   X,
 } from "lucide-react";
+import "../styles/FocusSession.css";
 
 const NAV_ITEMS = [
   { label: "Home", to: "/" },
-  { label: "Features", to: "/#features-section" },
-  { label: "About Us", to: "/#about-section" },
-  { label: "Contact Us", to: "/#contact-section" },
   { label: "My Profile", to: "/profile" },
 ];
 
 const SESSION_MINUTES = 25;
+const BREAK_MINUTES_DEFAULT = 5;
+
+// Shared with ProfilePage — this is what keeps this timer and the
+// "Current Focus Session" card on the profile page in sync.
+const FOCUS_SESSION_KEY = "studyhub_focus_session_v1";
+
+const THEME_OPTIONS = [
+  { id: "light", label: "Light" },
+  { id: "dark", label: "Dark" },
+];
+
+function loadSharedSession() {
+  try {
+    const raw = localStorage.getItem(FOCUS_SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveSharedSession(data) {
+  try {
+    localStorage.setItem(FOCUS_SESSION_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+// Account for real time that passed while the user was away from this page.
+function resolveSharedSession() {
+  const saved = loadSharedSession();
+  if (!saved) return null;
+  if (saved.running) {
+    const passed = Math.floor((Date.now() - (saved.savedAt || Date.now())) / 1000);
+    const remaining = Math.max(0, (saved.secondsLeft || 0) - passed);
+    return { ...saved, secondsLeft: remaining, running: remaining > 0 };
+  }
+  return saved;
+}
 
 const INITIAL_TASKS = [
   {
@@ -55,466 +91,81 @@ function formatClock(totalSeconds) {
   return `${m}:${s}`;
 }
 
-const styles = {
-  page: {
-    backgroundColor: "#F3F0E8",
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
-  },
-  nav: {
-    width: "100%",
-    backgroundColor: "#5B6066",
-  },
-  navInner: {
-    maxWidth: "1600px",
-    margin: "0 auto",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "18px 40px",
-    flexWrap: "wrap",
-    gap: "16px",
-  },
-  brand: {
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-    color: "#D9B94A",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-  },
-  navLinks: {
-    display: "flex",
-    alignItems: "center",
-    gap: "36px",
-    flexWrap: "wrap",
-  },
-  navLink: {
-    fontSize: "15px",
-    fontWeight: 500,
-    color: "rgba(255,255,255,0.85)",
-    textDecoration: "none",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-  },
-  navLinkActive: {
-    fontSize: "15px",
-    fontWeight: 500,
-    color: "#D9B94A",
-    textDecoration: "none",
-    borderBottom: "2px solid #D9B94A",
-    paddingBottom: "4px",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-  },
-  loginBtn: {
-    fontSize: "14px",
-    fontWeight: 600,
-    color: "#fff",
-    backgroundColor: "#1A2B33",
-    border: "none",
-    borderRadius: "8px",
-    padding: "10px 20px",
-    cursor: "pointer",
-  },
-  body: {
-    flex: 1,
-    display: "flex",
-    gap: "0",
-    maxWidth: "1600px",
-    width: "100%",
-    margin: "0 auto",
-    padding: "40px",
-    boxSizing: "border-box",
-    alignItems: "flex-start",
-  },
-  timerSection: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "620px",
-    position: "relative",
-  },
-  sessionPill: {
-    fontSize: "12px",
-    fontWeight: 700,
-    letterSpacing: "0.12em",
-    color: "#8A8377",
-    backgroundColor: "#E7E3D8",
-    padding: "8px 20px",
-    borderRadius: "999px",
-    marginBottom: "24px",
-  },
-  clock: {
-    fontSize: "160px",
-    fontWeight: 800,
-    letterSpacing: "-0.02em",
-    color: "#16242B",
-    lineHeight: 1,
-    margin: 0,
-    fontVariantNumeric: "tabular-nums",
-  },
-  controlsRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    marginTop: "48px",
-  },
-  playBtn: {
-    width: "72px",
-    height: "72px",
-    borderRadius: "16px",
-    backgroundColor: "#16242B",
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-  },
-  resetBtn: {
-    width: "72px",
-    height: "72px",
-    borderRadius: "16px",
-    backgroundColor: "#E7E3D8",
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-  },
-  focusingPill: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    marginTop: "40px",
-    padding: "12px 24px",
-    borderRadius: "999px",
-    backgroundColor: "#fff",
-    fontSize: "15px",
-    color: "#4A453C",
-  },
-  focusDot: {
-    width: "8px",
-    height: "8px",
-    borderRadius: "999px",
-    backgroundColor: "#B08900",
-    flexShrink: 0,
-  },
-  sidebar: {
-    width: "420px",
-    flexShrink: 0,
-    backgroundColor: "#FBF9F4",
-    borderRadius: "24px",
-    padding: "28px",
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "880px",
-  },
-  sidebarHeaderRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "24px",
-  },
-  sidebarTitle: {
-    fontSize: "26px",
-    fontWeight: 700,
-    color: "#16242B",
-    margin: 0,
-  },
-  addBtn: {
-    width: "34px",
-    height: "34px",
-    borderRadius: "999px",
-    backgroundColor: "#16242B",
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    flexShrink: 0,
-  },
-  taskList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "14px",
-  },
-  taskCard: (current) => ({
-    borderRadius: "14px",
-    padding: "18px 20px",
-    backgroundColor: current ? "#fff" : "#EFECE3",
-    borderLeft: current ? "4px solid #16242B" : "4px solid transparent",
-    cursor: "pointer",
-    boxShadow: current ? "0 2px 8px rgba(0,0,0,0.06)" : "none",
-  }),
-  taskTopRow: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: "8px",
-  },
-  currentLabel: {
-    fontSize: "11px",
-    fontWeight: 700,
-    letterSpacing: "0.08em",
-    color: "#A8A192",
-    marginBottom: "6px",
-  },
-  taskTitle: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: "#16242B",
-    margin: 0,
-  },
-  taskTitleDone: {
-    fontSize: "16px",
-    fontWeight: 700,
-    color: "#A8A192",
-    margin: 0,
-    textDecoration: "line-through",
-  },
-  dragHandle: {
-    color: "#C7C2B5",
-    flexShrink: 0,
-    cursor: "grab",
-  },
-  metaRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    marginTop: "10px",
-    fontSize: "13px",
-    color: "#8A8377",
-  },
-  tagAcademic: {
-    display: "inline-block",
-    fontSize: "11px",
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-    color: "#8A6A1E",
-    backgroundColor: "#F3D98B",
-    padding: "4px 10px",
-    borderRadius: "6px",
-    marginTop: "10px",
-  },
-  priorityLabel: {
-    fontSize: "13px",
-    color: "#8A8377",
-    marginTop: "10px",
-  },
-  removeBtn: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    color: "#C7C2B5",
-    flexShrink: 0,
-  },
-  dropZone: {
-    marginTop: "6px",
-    borderRadius: "14px",
-    border: "2px dashed #D9D4C7",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "36px 0",
-    color: "#B8B2A2",
-  },
-  dropZoneLabel: {
-    fontSize: "12px",
-    fontWeight: 700,
-    letterSpacing: "0.08em",
-    marginTop: "10px",
-  },
-  spacer: {
-    flex: 1,
-  },
-  progressSection: {
-    marginTop: "20px",
-    paddingTop: "20px",
-    borderTop: "1px solid #E4DFD1",
-  },
-  progressRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "10px",
-  },
-  progressLabel: {
-    fontSize: "12px",
-    fontWeight: 700,
-    letterSpacing: "0.06em",
-    color: "#8A8377",
-  },
-  progressValue: {
-    fontSize: "13px",
-    fontWeight: 700,
-    color: "#16242B",
-  },
-  progressTrack: {
-    width: "100%",
-    height: "8px",
-    borderRadius: "999px",
-    backgroundColor: "#E4DFD1",
-    overflow: "hidden",
-  },
-  progressFill: (pct) => ({
-    width: `${pct}%`,
-    height: "100%",
-    backgroundColor: "#16242B",
-    borderRadius: "999px",
-    transition: "width 0.3s ease",
-  }),
-  bottomBar: {
-    backgroundColor: "#EFEBE0",
-    width: "100%",
-  },
-  bottomBarInner: {
-    maxWidth: "1600px",
-    margin: "0 auto",
-    padding: "18px 40px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    gap: "16px",
-  },
-  bottomLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: "28px",
-  },
-  bottomControl: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    fontSize: "14px",
-    fontWeight: 600,
-    color: "#2A2620",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-  },
-  bottomCenter: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  avatarStack: {
-    display: "flex",
-    alignItems: "center",
-  },
-  avatarImg: {
-    width: "30px",
-    height: "30px",
-    borderRadius: "999px",
-    objectFit: "cover",
-    border: "2px solid #EFEBE0",
-    marginLeft: "-8px",
-  },
-  avatarCount: {
-    width: "30px",
-    height: "30px",
-    borderRadius: "999px",
-    backgroundColor: "#F3D98B",
-    color: "#7A5C1E",
-    fontSize: "12px",
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "2px solid #EFEBE0",
-    marginLeft: "-8px",
-  },
-  scholarsText: {
-    fontSize: "14px",
-    color: "#4A453C",
-  },
-  bottomRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "18px",
-  },
-  iconBtn: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    color: "#4A453C",
-    display: "flex",
-  },
-  addTaskRow: {
-    display: "flex",
-    gap: "8px",
-    marginBottom: "4px",
-  },
-  addTaskInput: {
-    flex: 1,
-    padding: "10px 12px",
-    borderRadius: "8px",
-    border: "1px solid #D9D4C7",
-    outline: "none",
-    fontSize: "14px",
-    boxSizing: "border-box",
-  },
-  addTaskConfirm: {
-    padding: "0 16px",
-    borderRadius: "8px",
-    border: "none",
-    backgroundColor: "#16242B",
-    color: "#fff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-};
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen().catch(() => {});
+    }
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+}
 
 function NavBar() {
   return (
-    <header style={styles.nav}>
-      <div style={styles.navInner}>
-        <Link to="/" style={styles.brand}>
+    <header className="nav">
+      <div className="nav-inner">
+        <Link to="/" className="brand">
           StudyHub
         </Link>
-        <nav style={styles.navLinks}>
+        <nav className="nav-links">
           {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              style={item.label === "My Profile" ? styles.navLinkActive : styles.navLink}
-            >
+            <Link key={item.label} to={item.to} className="nav-link">
               {item.label}
             </Link>
           ))}
         </nav>
-        <Link to="/login" style={styles.loginBtn}>
-          Login
-        </Link>
       </div>
     </header>
   );
 }
 
 export default function FocusSessionPage() {
-  const [secondsLeft, setSecondsLeft] = useState(SESSION_MINUTES * 60);
-  const [running, setRunning] = useState(false);
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const initialSession = resolveSharedSession();
+
+  const [focusMinutes, setFocusMinutes] = useState(initialSession?.focusMinutes || SESSION_MINUTES);
+  const [breakMinutes, setBreakMinutes] = useState(initialSession?.breakMinutes || BREAK_MINUTES_DEFAULT);
+  const [phase, setPhase] = useState(initialSession?.phase || "focus");
+  const [secondsLeft, setSecondsLeft] = useState(
+    initialSession ? initialSession.secondsLeft : SESSION_MINUTES * 60
+  );
+  const [running, setRunning] = useState(initialSession ? initialSession.running : false);
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [draftFocusMinutes, setDraftFocusMinutes] = useState(focusMinutes);
+  const [draftBreakMinutes, setDraftBreakMinutes] = useState(breakMinutes);
+
+  const [tasks, setTasks] = useState(initialSession?.tasks || INITIAL_TASKS);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const dropHover = useRef(false);
   const [isDropHover, setIsDropHover] = useState(false);
+
+  const [theme, setTheme] = useState(initialSession?.theme || "light");
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!running) return;
     if (secondsLeft <= 0) {
-      setRunning(false);
+      if (phase === "focus") {
+        setPhase("break");
+        setSecondsLeft(breakMinutes * 60);
+      } else {
+        setPhase("focus");
+        setSecondsLeft(focusMinutes * 60);
+        setRunning(false);
+      }
       return;
     }
     const id = setInterval(() => {
       setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
     }, 1000);
     return () => clearInterval(id);
-  }, [running, secondsLeft]);
+  }, [running, secondsLeft, phase, breakMinutes, focusMinutes]);
+
+  useEffect(() => {
+    saveSharedSession({ focusMinutes, breakMinutes, phase, secondsLeft, running, tasks, theme });
+  }, [focusMinutes, breakMinutes, phase, secondsLeft, running, tasks, theme]);
 
   const currentTask = tasks.find((t) => t.current && !t.done);
   const activeTasks = tasks.filter((t) => !t.done);
@@ -547,43 +198,47 @@ export default function FocusSessionPage() {
     setShowAddTask(false);
   }
 
+  function openSettings() {
+    setDraftFocusMinutes(focusMinutes);
+    setDraftBreakMinutes(breakMinutes);
+    setShowSettings((s) => !s);
+  }
+
+  function applySettings() {
+    const fm = Math.max(1, Number(draftFocusMinutes) || 1);
+    const bm = Math.max(1, Number(draftBreakMinutes) || 1);
+    setFocusMinutes(fm);
+    setBreakMinutes(bm);
+    setPhase("focus");
+    setSecondsLeft(fm * 60);
+    setRunning(false);
+    setShowSettings(false);
+  }
+
   return (
-    <div className="sh-focus" style={styles.page}>
-      <style>{`
-        .sh-focus, .sh-focus * { box-sizing: border-box; }
-        .sh-focus p, .sh-focus h1, .sh-focus h2, .sh-focus h3 { margin: 0; }
-        .sh-focus button {
-          font-family: inherit;
-          appearance: none;
-          -webkit-appearance: none;
-          padding: 0;
-          font-size: inherit;
-        }
-        .sh-focus input, .sh-focus textarea { font-family: inherit; }
-        .sh-focus a { text-decoration: none; }
-        .sh-focus img { display: block; max-width: none; }
-      `}</style>
+    <div className={theme === "dark" ? "sh-focus page dark" : "sh-focus page"}>
       <NavBar />
 
-      <div style={styles.body}>
-        <div style={styles.timerSection}>
-          <span style={styles.sessionPill}>DEEP WORK SESSION</span>
+      <div className="body">
+        <div className="timer-section">
+          <span className="session-pill">{phase === "break" ? "BREAK TIME" : "DEEP WORK SESSION"}</span>
 
-          <h1 style={styles.clock}>{formatClock(secondsLeft)}</h1>
+          <h1 className="clock">{formatClock(secondsLeft)}</h1>
 
-          <div style={styles.controlsRow}>
+          <div className="controls-row">
             <button
-              style={styles.playBtn}
+              className="play-btn"
               onClick={() => setRunning((r) => !r)}
               aria-label={running ? "Pause" : "Start"}
             >
               {running ? <Pause size={26} color="#fff" fill="#fff" /> : <Play size={26} color="#fff" fill="#fff" />}
             </button>
             <button
-              style={styles.resetBtn}
+              className="reset-btn"
               onClick={() => {
                 setRunning(false);
-                setSecondsLeft(SESSION_MINUTES * 60);
+                setPhase("focus");
+                setSecondsLeft(focusMinutes * 60);
               }}
               aria-label="Reset"
             >
@@ -591,71 +246,102 @@ export default function FocusSessionPage() {
             </button>
           </div>
 
-          <div style={styles.focusingPill}>
-            <span style={styles.focusDot} />
+          <button className="timer-settings-btn" onClick={openSettings}>
+            <Settings size={14} /> Set Timer &amp; Break
+          </button>
+
+          {showSettings && (
+            <div className="timer-settings-panel">
+              <div className="timer-settings-field">
+                <label>Focus (minutes)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={draftFocusMinutes}
+                  onChange={(e) => setDraftFocusMinutes(e.target.value)}
+                />
+              </div>
+              <div className="timer-settings-field">
+                <label>Break (minutes)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={draftBreakMinutes}
+                  onChange={(e) => setDraftBreakMinutes(e.target.value)}
+                />
+              </div>
+              <button className="timer-settings-apply" onClick={applySettings}>
+                Apply
+              </button>
+            </div>
+          )}
+
+          <div className="focusing-pill">
+            <span className="focus-dot" />
             Focusing on: {currentTask ? currentTask.title : "No task selected"}
+          </div>
+
+          <div className="break-info-pill">
+            {phase === "break"
+              ? `On break — ${formatClock(secondsLeft)} left`
+              : `Break after this session: ${breakMinutes} min`}
           </div>
         </div>
 
-        <div style={styles.sidebar}>
-          <div style={styles.sidebarHeaderRow}>
-            <h2 style={styles.sidebarTitle}>Task Queue</h2>
-            <button style={styles.addBtn} onClick={() => setShowAddTask((s) => !s)} aria-label="Add task">
+        <div className="sidebar">
+          <div className="sidebar-header-row">
+            <h2 className="sidebar-title">Task Queue</h2>
+            <button className="add-btn" onClick={() => setShowAddTask((s) => !s)} aria-label="Add task">
               {showAddTask ? <X size={16} color="#fff" /> : <Plus size={16} color="#fff" />}
             </button>
           </div>
 
           {showAddTask && (
-            <div style={styles.addTaskRow}>
+            <div className="add-task-row">
               <input
                 autoFocus
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addTask()}
                 placeholder="New task title"
-                style={styles.addTaskInput}
+                className="add-task-input"
               />
-              <button style={styles.addTaskConfirm} onClick={addTask}>
+              <button className="add-task-confirm" onClick={addTask}>
                 Add
               </button>
             </div>
           )}
 
-          <div style={styles.taskList}>
+          <div className="task-list">
             {activeTasks.map((task) => (
               <div
                 key={task.id}
-                style={styles.taskCard(task.current)}
+                className={task.current ? "task-card current" : "task-card"}
                 onClick={() => selectTask(task.id)}
                 draggable
                 onDragStart={(e) => e.dataTransfer.setData("text/plain", String(task.id))}
               >
-                <div style={styles.taskTopRow}>
+                <div className="task-top-row">
                   <div style={{ flex: 1 }}>
-                    {task.current && <p style={styles.currentLabel}>CURRENT TASK</p>}
-                    <p style={task.done ? styles.taskTitleDone : styles.taskTitle}>{task.title}</p>
+                    {task.current && <p className="current-label">CURRENT TASK</p>}
+                    <p className={task.done ? "task-title done" : "task-title"}>{task.title}</p>
 
                     {task.meta.type === "due" && (
-                      <div style={styles.metaRow}>
+                      <div className="meta-row">
                         <Calendar size={13} /> {task.meta.label}
                       </div>
                     )}
-                    {task.meta.type === "tag" && <span style={styles.tagAcademic}>{task.meta.label}</span>}
-                    {task.meta.type === "priority" && <p style={styles.priorityLabel}>{task.meta.label}</p>}
+                    {task.meta.type === "tag" && <span className="tag-academic">{task.meta.label}</span>}
+                    {task.meta.type === "priority" && <p className="priority-label">{task.meta.label}</p>}
                   </div>
-                  <GripVertical size={16} style={styles.dragHandle} />
+                  <GripVertical size={16} className="drag-handle" />
                 </div>
               </div>
             ))}
           </div>
 
           <div
-            style={{
-              ...styles.dropZone,
-              backgroundColor: isDropHover ? "#EFECE3" : "transparent",
-              borderColor: isDropHover ? "#16242B" : "#D9D4C7",
-              marginTop: "14px",
-            }}
+            className={isDropHover ? "drop-zone hover" : "drop-zone"}
             onDragOver={(e) => {
               e.preventDefault();
               setIsDropHover(true);
@@ -664,58 +350,56 @@ export default function FocusSessionPage() {
             onDrop={handleDrop}
           >
             <Archive size={20} />
-            <span style={styles.dropZoneLabel}>DROP HERE TO ARCHIVE</span>
+            <span className="drop-zone-label">DROP HERE TO ARCHIVE</span>
           </div>
 
-          <div style={styles.spacer} />
+          <div className="spacer" />
 
-          <div style={styles.progressSection}>
-            <div style={styles.progressRow}>
-              <span style={styles.progressLabel}>SESSION PROGRESS</span>
-              <span style={styles.progressValue}>
+          <div className="progress-section">
+            <div className="progress-row">
+              <span className="progress-label">SESSION PROGRESS</span>
+              <span className="progress-value">
                 {doneCount} / {tasks.length} Tasks
               </span>
             </div>
-            <div style={styles.progressTrack}>
-              <div style={styles.progressFill(progressPct)} />
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${progressPct}%` }} />
             </div>
           </div>
         </div>
       </div>
 
-      <div style={styles.bottomBar}>
-        <div style={styles.bottomBarInner}>
-          <div style={styles.bottomLeft}>
-            <button style={styles.bottomControl}>
-              <Volume2 size={16} /> Lo-fi Library Ambient
-            </button>
-            <button style={styles.bottomControl}>
-              <Palette size={16} /> Night Owl Theme
-            </button>
-          </div>
-
-          <div style={styles.bottomCenter}>
-            <div style={styles.avatarStack}>
-              <img
-                src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=80&h=80&fit=crop&crop=faces"
-                alt=""
-                style={{ ...styles.avatarImg, marginLeft: 0 }}
-              />
-              <img
-                src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop&crop=faces"
-                alt=""
-                style={styles.avatarImg}
-              />
-              <span style={styles.avatarCount}>+14</span>
+      <div className="bottom-bar">
+        <div className="bottom-bar-inner">
+          <div className="bottom-left">
+            <div className="footer-dropdown-wrap">
+              <button
+                className="bottom-control"
+                onClick={() => setThemeMenuOpen((s) => !s)}
+              >
+                <Palette size={16} /> {THEME_OPTIONS.find((o) => o.id === theme)?.label || "Theme"}
+              </button>
+              {themeMenuOpen && (
+                <div className="footer-dropdown">
+                  {THEME_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      className={opt.id === theme ? "footer-dropdown-item active" : "footer-dropdown-item"}
+                      onClick={() => {
+                        setTheme(opt.id);
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <span style={styles.scholarsText}>16 scholars studying now</span>
           </div>
 
-          <div style={styles.bottomRight}>
-            <button style={styles.iconBtn} aria-label="Settings">
-              <Settings size={18} />
-            </button>
-            <button style={styles.iconBtn} aria-label="Fullscreen">
+          <div className="bottom-right">
+            <button className="icon-btn" aria-label="Toggle fullscreen" onClick={toggleFullscreen}>
               <Maximize2 size={18} />
             </button>
           </div>
