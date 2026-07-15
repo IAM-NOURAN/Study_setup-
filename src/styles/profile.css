@@ -50,16 +50,6 @@
   padding-bottom: 4px;
 }
 
-.profile-login-btn {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-}
-
 .profile-main {
   max-width: 1152px;
   width: 100%;
@@ -248,65 +238,76 @@
   margin-top: 4px;
 }
 
-.profile-btn-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.profile-export-btn {
-  font-size: 14px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background-color: #fff;
-  color: #1a2b33;
-  border: none;
-  cursor: pointer;
-}
-
-.profile-trends-btn {
-  font-size: 14px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background-color: #1a2b33;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
 .profile-activity-card {
   margin-top: 20px;
   padding: 20px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.65);
   border: 1px solid rgba(26, 43, 51, 0.08);
+  overflow-x: auto;
 }
 
-.profile-activity-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.profile-activity-cell {
+.profile-activity-months-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 3px;
+  margin-left: 34px;
+  margin-bottom: 4px;
+}
+
+.profile-activity-month-cell {
+  width: 11px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b655a;
+  flex-shrink: 0;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.profile-activity-graph {
+  display: flex;
   gap: 6px;
 }
 
+.profile-activity-day-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.profile-activity-day-labels span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b655a;
+  height: 11px;
+  line-height: 11px;
+}
+
+.profile-activity-weeks {
+  display: flex;
+  gap: 3px;
+}
+
+.profile-activity-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
 .profile-activity-square {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
   border: 1px solid rgba(26, 43, 51, 0.12);
   background-color: #ece4d3;
+  flex-shrink: 0;
 }
 
 .profile-activity-square.active {
-  box-shadow: 0 0 0 2px rgba(217, 185, 74, 0.35);
+  box-shadow: 0 0 0 2px rgba(217, 185, 74, 0.6);
 }
 
 .profile-activity-low {
@@ -321,33 +322,14 @@
   background-color: #1f7a3d;
 }
 
-.profile-activity-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #6b655a;
-}
-
-.profile-days-row {
+.profile-activity-legend {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 16px;
-  border-top: 1px solid #d9d4c7;
-}
-
-.profile-day-btn {
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #a8a192;
-  font-weight: 500;
-}
-
-.profile-day-btn.active {
-  color: #1a2b33;
-  font-weight: 700;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b655a;
 }
 
 .profile-section-header-row {

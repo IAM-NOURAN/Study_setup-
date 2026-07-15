@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/profile.css";
 
 const NAV_ITEMS = [
@@ -7,7 +7,6 @@ const NAV_ITEMS = [
   { label: "My Profile", to: "/profile" },
 ];
 
-const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 const ICON_CHOICES = ["🔬", "Σ", "📜", "🧪", "📚", "🧬", "🗺️", "💻"];
 const BORDER_CHOICES = ["#1A2B33", "#B08900", "#5B8FB0", "#7A5C8E", "#3E7A5E"];
 
@@ -45,6 +44,9 @@ const BREAK_MINUTES_DEFAULT = 5;
 // Shared with FocusSessionPage — this is what keeps "Current Focus Session"
 // on the profile in sync with the actual timer page.
 const FOCUS_SESSION_KEY = "studyhub_focus_session_v1";
+
+// How many weeks of history the GitHub-style activity graph shows.
+const WEEKS_TO_SHOW = 53;
 
 function loadSavedProfile() {
   try {
@@ -108,9 +110,85 @@ function formatTime(totalSeconds) {
   return `${h}:${m}:${s}`;
 }
 
-function todayIndex() {
-  const jsDay = new Date().getDay();
-  return jsDay === 0 ? 6 : jsDay - 1;
+// --- Contribution-graph helpers -------------------------------------------
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// 0 = no focus time, 1 = <30min, 2 = <2h, 3 = <5h (or more — darkest tier we have)
+function tierForMinutes(minutes) {
+  if (!minutes) return 0;
+  if (minutes < 30) return 1;
+  if (minutes < 120) return 2;
+  return 3;
+}
+
+function tierClass(tier) {
+  if (tier <= 0) return "activity-empty";
+  if (tier === 1) return "activity-low";
+  if (tier === 2) return "activity-medium";
+  return "activity-high";
+}
+
+function formatFocusDuration(minutes) {
+  if (!minutes) return "No focus time";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}m focused`;
+  if (m === 0) return `${h}h focused`;
+  return `${h}h ${m}m focused`;
+}
+
+// Builds a GitHub-style grid: an array of weeks, each an array of 7 days
+// (Sun..Sat), ending on the current week, using accumulated focus minutes
+// per calendar date to decide each day's color tier.
+function buildContributionWeeks(dailyMinutes, weeksToShow) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayKey = dateKey(today);
+
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(endOfWeek.getDate() + (6 - today.getDay()));
+
+  const totalDays = weeksToShow * 7;
+  const startDate = new Date(endOfWeek);
+  startDate.setDate(startDate.getDate() - (totalDays - 1));
+
+  const weeks = [];
+  const cursor = new Date(startDate);
+  for (let w = 0; w < weeksToShow; w++) {
+    const week = [];
+    for (let d = 0; d < 7; d++) {
+      const key = dateKey(cursor);
+      const minutes = dailyMinutes[key] || 0;
+      week.push({
+        key,
+        date: new Date(cursor),
+        minutes,
+        tier: tierForMinutes(minutes),
+        isToday: key === todayKey,
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    weeks.push(week);
+  }
+  return weeks;
+}
+
+// Returns an array parallel to `weeks`, with a month abbreviation at the
+// index where that month first appears, and null everywhere else.
+function getMonthLabels(weeks) {
+  const labels = new Array(weeks.length).fill(null);
+  let lastMonth = null;
+  weeks.forEach((week, i) => {
+    const month = week[0].date.getMonth();
+    if (month !== lastMonth) {
+      labels[i] = week[0].date.toLocaleString("default", { month: "short" });
+      lastMonth = month;
+    }
+  });
+  return labels;
 }
 
 function NavBar() {
@@ -121,6 +199,7 @@ function NavBar() {
           StudyHub
         </Link>
         <nav className="profile-nav-links">
+        <Link to="/tasks" className="profile-nav-link">To-do List</Link>
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.label}
@@ -129,7 +208,6 @@ function NavBar() {
             >
               {item.label}
             </Link>
-             
           ))}
         </nav>
       </div>
@@ -156,6 +234,8 @@ function Footer() {
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
+
   // Load any previously-saved profile data (name / avatar / notebooks).
   // Everything the user edits about their profile persists across visits;
   // the focus session itself always starts fresh, like a brand-new login.
@@ -184,12 +264,18 @@ export default function ProfilePage() {
   // When present, it replaces the "what are you studying today?" prompt.
   const sharedCurrentTask = (initialSession?.tasks || []).find((t) => t.current && !t.done);
 
-  const [activeDayIndex, setActiveDayIndex] = useState(todayIndex());
-  const [sessionCounts, setSessionCounts] = useState(() => {
+  // Accumulated focus minutes per calendar date (e.g. "2026-07-15": 75),
+  // used to draw the GitHub-style activity graph below.
+  const [dailyMinutes, setDailyMinutes] = useState(() => {
     const savedDashboard = loadDashboardData();
-    return savedDashboard?.sessionCounts || [0, 0, 0, 0, 0, 0, 0];
+    return savedDashboard?.dailyMinutes || {};
   });
   const [sessionCompleted, setSessionCompleted] = useState(false);
+
+  // The activity graph scrolls horizontally (53 weeks wide); this ref lets us
+  // auto-scroll it to today's square whenever the focus minutes change,
+  // instead of leaving the newly-colored square hidden off-screen to the right.
+  const activityScrollRef = useRef(null);
 
   // Fresh login state: no notebooks yet until the user creates their own
   const [notebooks, setNotebooks] = useState(saved?.notebooks || []);
@@ -206,14 +292,11 @@ export default function ProfilePage() {
     if (!running) return;
     if (elapsedSeconds <= 0) {
       if (phase === "focus") {
-        const day = new Date().getDay();
-        const index = day === 0 ? 6 : day - 1;
-        setSessionCounts((prev) => {
-          const next = [...prev];
-          next[index] = (next[index] || 0) + 1;
-          return next;
-        });
-        setActiveDayIndex(index);
+        const key = dateKey(new Date());
+        setDailyMinutes((prev) => ({
+          ...prev,
+          [key]: (prev[key] || 0) + focusMinutes,
+        }));
         setSessionCompleted(true);
         setPhase("break");
         setElapsedSeconds(breakMinutes * 60);
@@ -229,8 +312,16 @@ export default function ProfilePage() {
   }, [running, elapsedSeconds, phase, breakMinutes, focusMinutes]);
 
   useEffect(() => {
-    saveDashboardData({ sessionCounts });
-  }, [sessionCounts]);
+    saveDashboardData({ dailyMinutes });
+  }, [dailyMinutes]);
+
+  // Keep today's square in view: scroll the activity graph all the way right
+  // whenever the focus minutes change (including on first mount).
+  useEffect(() => {
+    if (activityScrollRef.current) {
+      activityScrollRef.current.scrollLeft = activityScrollRef.current.scrollWidth;
+    }
+  }, [dailyMinutes]);
 
   // Persist profile data (name, avatar, notebooks) whenever it changes
   useEffect(() => {
@@ -328,6 +419,9 @@ export default function ProfilePage() {
     setNotebooks((prev) => prev.filter((n) => n.id !== id));
   }
 
+  const contributionWeeks = buildContributionWeeks(dailyMinutes, WEEKS_TO_SHOW);
+  const monthLabels = getMonthLabels(contributionWeeks);
+
   return (
     <div className="profile-page">
       <NavBar />
@@ -423,27 +517,52 @@ export default function ProfilePage() {
           <div className="profile-dashboard-header-row">
             <div>
               <h2 className="profile-h2">Study Activity</h2>
-              <p className="profile-sub-text">Completed focus sessions this week</p>
+              <p className="profile-sub-text">Your daily focus time</p>
             </div>
           </div>
 
-          <div className="profile-activity-card">
-            <div className="profile-activity-grid">
-              {sessionCounts.map((count, index) => {
-                const intensity = count === 0 ? 0 : count >= 3 ? 3 : count >= 2 ? 2 : 1;
-                const colorClass = ["activity-empty", "activity-low", "activity-medium", "activity-high"][intensity];
-                return (
-                  <div key={DAYS[index]} className="profile-activity-cell">
-                    <div
-                      className={`profile-activity-square ${colorClass} ${index === activeDayIndex ? "active" : ""}`}
-                      title={`${DAYS[index]}: ${count} session${count === 1 ? "" : "s"}`}
-                    >
-                      {count > 0 ? <span className="profile-activity-count">{count}</span> : null}
-                    </div>
-                    <span className="profile-activity-label">{DAYS[index]}</span>
+          <div className="profile-activity-card" ref={activityScrollRef}>
+            <div className="profile-activity-months-row">
+              {contributionWeeks.map((week, i) => (
+                <div key={i} className="profile-activity-month-cell">
+                  {monthLabels[i] || ""}
+                </div>
+              ))}
+            </div>
+
+            <div className="profile-activity-graph">
+              <div className="profile-activity-day-labels">
+                <span></span>
+                <span>Mon</span>
+                <span></span>
+                <span>Wed</span>
+                <span></span>
+                <span>Fri</span>
+                <span></span>
+              </div>
+
+              <div className="profile-activity-weeks">
+                {contributionWeeks.map((week, wi) => (
+                  <div key={wi} className="profile-activity-week-col">
+                    {week.map((day) => (
+                      <div
+                        key={day.key}
+                        className={`profile-activity-square ${tierClass(day.tier)} ${day.isToday ? "active" : ""}`}
+                        title={`${day.key}: ${formatFocusDuration(day.minutes)}`}
+                      />
+                    ))}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            </div>
+
+            <div className="profile-activity-legend">
+              <span>Less</span>
+              <div className="profile-activity-square activity-empty" />
+              <div className="profile-activity-square activity-low" />
+              <div className="profile-activity-square activity-medium" />
+              <div className="profile-activity-square activity-high" />
+              <span>More</span>
             </div>
           </div>
         </div>
@@ -462,8 +581,8 @@ export default function ProfilePage() {
               key={nb.id}
               className="profile-notebook-card"
               style={{ borderLeft: `4px solid ${nb.border}` }}
-              onClick={() => bumpNotes(nb.id)}
-              title="Click to log a new note"
+              onClick={() => navigate(`/notebook/${nb.id}`)}
+              title={`Open ${nb.title}`}
             >
               <div className="profile-notebook-top-row">
                 <div className="profile-notebook-icon">{nb.icon}</div>

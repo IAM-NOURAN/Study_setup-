@@ -26,6 +26,7 @@ const BREAK_MINUTES_DEFAULT = 5;
 // Shared with ProfilePage — this is what keeps this timer and the
 // "Current Focus Session" card on the profile page in sync.
 const FOCUS_SESSION_KEY = "studyhub_focus_session_v1";
+const DASHBOARD_KEY = "studyhub_dashboard_v1";
 
 const THEME_OPTIONS = [
   { id: "light", label: "Light" },
@@ -44,6 +45,22 @@ function loadSharedSession() {
 function saveSharedSession(data) {
   try {
     localStorage.setItem(FOCUS_SESSION_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function recordCompletedFocusMinutes(minutes) {
+  try {
+    const raw = localStorage.getItem(DASHBOARD_KEY);
+    const existing = raw ? JSON.parse(raw) : { dailyMinutes: {} };
+    const dailyMinutes = existing.dailyMinutes || {};
+    const key = dateKey(new Date());
+    dailyMinutes[key] = (dailyMinutes[key] || 0) + minutes;
+    localStorage.setItem(DASHBOARD_KEY, JSON.stringify({ ...existing, dailyMinutes }));
   } catch (e) {
     // ignore storage errors
   }
@@ -69,20 +86,6 @@ const INITIAL_TASKS = [
     current: true,
     done: false,
   },
-  {
-    id: 2,
-    title: "Research Methodology Draft",
-    meta: { type: "tag", label: "ACADEMIC" },
-    current: false,
-    done: false,
-  },
-  {
-    id: 3,
-    title: "Email Professor regarding Thesis",
-    meta: { type: "priority", label: "High Priority" },
-    current: false,
-    done: false,
-  },
 ];
 
 function formatClock(totalSeconds) {
@@ -104,14 +107,19 @@ function toggleFullscreen() {
 
 function NavBar() {
   return (
-    <header className="nav">
-      <div className="nav-inner">
-        <Link to="/" className="brand">
+    <header className="profile-nav">
+      <div className="profile-nav-inner">
+        <Link to="/" className="profile-brand">
           StudyHub
         </Link>
-        <nav className="nav-links">
+        <nav className="profile-nav-links">
+        <Link to="/tasks" className="profile-nav-link">To-do List</Link>
           {NAV_ITEMS.map((item) => (
-            <Link key={item.label} to={item.to} className="nav-link">
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`profile-nav-link ${item.label === "My Profile" ? "active" : ""}`}
+            >
               {item.label}
             </Link>
           ))}
@@ -144,24 +152,25 @@ export default function FocusSessionPage() {
   const [theme, setTheme] = useState(initialSession?.theme || "light");
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
 
-  useEffect(() => {
-    if (!running) return;
-    if (secondsLeft <= 0) {
-      if (phase === "focus") {
-        setPhase("break");
-        setSecondsLeft(breakMinutes * 60);
-      } else {
-        setPhase("focus");
-        setSecondsLeft(focusMinutes * 60);
-        setRunning(false);
-      }
-      return;
+useEffect(() => {
+  if (!running) return;
+  if (secondsLeft <= 0) {
+    if (phase === "focus") {
+      recordCompletedFocusMinutes(focusMinutes);
+      setPhase("break");
+      setSecondsLeft(breakMinutes * 60);
+    } else {
+      setPhase("focus");
+      setSecondsLeft(focusMinutes * 60);
+      setRunning(false);
     }
+    return;
+  }
     const id = setInterval(() => {
-      setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [running, secondsLeft, phase, breakMinutes, focusMinutes]);
+    setSecondsLeft((s) => (s > 0 ? s - 1 : 0));
+  }, 1000);
+  return () => clearInterval(id);
+}, [running, secondsLeft, phase, breakMinutes, focusMinutes]);
 
   useEffect(() => {
     saveSharedSession({ focusMinutes, breakMinutes, phase, secondsLeft, running, tasks, theme });

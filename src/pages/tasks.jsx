@@ -10,8 +10,6 @@ function Tasks() {
   const [tasks, setTasks] = useState([
     { id: 1, title: "Finalize Research Methodology", desc: "Qualitative analysis section for the Semester Thesis", completed: true, active: true },
     { id: 2, title: "Review Bibliographic Citations", desc: "Ensure all APA 7th Edition formats are consistent", completed: false, active: false },
-    { id: 3, title: "Attend Seminar: Modern Epistemology", desc: "Main Auditorium, 10:00 AM", completed: true, active: false },
-    { id: 4, title: "Draft Abstract for Symposium", desc: "250-word summary of current laboratory findings", completed: false, active: false }
   ]);
 
   // 2. State to control the visibility of the popup screen (Modal)

@@ -37,11 +37,14 @@ function Header() {
           <a href={getSectionLink("about-section")} className="nav-link">About Us</a>
           <a href={getSectionLink("contact-section")} className="nav-link">Contact Us</a>
           
-          <Link to="/tasks" className="nav-link">Study Resources</Link>
+          <Link to="/tasks" className="nav-link">To-Do List</Link>
           
           <Link to={isLoggedIn ? "/profile" : "/signup"} className="nav-link">
             My Profile
           </Link>
+          {/* <Link to= "/profile" className="nav-link">
+            My Profile
+          </Link> */}
         </nav>
 
         <div id="header-actions" className="d-flex align-items-center gap-3">
@@ -73,7 +76,7 @@ function Header() {
           <a href={getSectionLink("about-section")} className="sidebar-link" onClick={toggleMenu}>About Us</a>
           <a href={getSectionLink("contact-section")} className="sidebar-link" onClick={toggleMenu}>Contact Us</a>
           
-          <Link to="/tasks" className="sidebar-link" onClick={toggleMenu}>Study Resources</Link>
+          <Link to="/tasks" className="sidebar-link" onClick={toggleMenu}>To-Do List</Link>
           <Link to={isLoggedIn ? "/profile" : "/auth/signup"} className="sidebar-link" onClick={toggleMenu}>My Profile</Link>
           
           <hr className="sidebar-divider" />
