@@ -77,7 +77,7 @@ function Header() {
           <a href={getSectionLink("contact-section")} className="sidebar-link" onClick={toggleMenu}>Contact Us</a>
           
           <Link to="/tasks" className="sidebar-link" onClick={toggleMenu}>To-Do List</Link>
-          <Link to={isLoggedIn ? "/profile" : "/auth/signup"} className="sidebar-link" onClick={toggleMenu}>My Profile</Link>
+          <Link to={isLoggedIn ? "/profile" : "/signup"} className="sidebar-link" onClick={toggleMenu}>My Profile</Link>
           
           <hr className="sidebar-divider" />
           <Link to="/login" className="sidebar-link login-sidebar-link" onClick={toggleMenu}>Login</Link>
