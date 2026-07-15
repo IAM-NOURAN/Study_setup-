@@ -3,38 +3,31 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/home.css'; 
 import { useAuth } from '../context/AuthContext';
+import Header from '../components/header';
+import Footer from '../components/footer';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import ContactForm from '../components/contactForm';
 
 function Home() {
   const { isLoggedIn } = useAuth();
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      
+      const element = document.getElementById(hash.replace('#', ''));
+      if (element) {
+       
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [hash]);
 
   return (
     <>
-      <header id="main-header" className="site-header sticky-top">
-        <div className="container d-flex justify-content-between align-items-center py-3">
-          <div id="logo-container" className="d-flex align-items-center gap-2">
-            <span className="logo-text font-headline text-uppercase">study hub</span>
-            <span className="study-track-badge d-none d-md-inline-block text-uppercase">STUDY TRACK</span>
-          </div>
-
-          <nav id="main-nav" className="d-none d-md-flex align-items-center gap-4">
-            <Link to="/" className="nav-link active">Home</Link>
-            <a href="#features-section" className="nav-link">Features</a>
-            <a href="#about-section" className="nav-link">About Us</a>
-            <a href="#contact-section" className="nav-link">Contact Us</a>
-            <Link to="/tasks" className="nav-link">Study Resources</Link>
-            <Link to="/profile" className="nav-link">My Profile</Link>
-          </nav>
-
-          <div id="header-actions" className="d-flex align-items-center gap-3">
-            <Link to="/login" id="login-btn" className="btn-login font-headline text-decoration-none d-inline-flex align-items-center justify-content-center">
-              Login
-            </Link>
-            <button id="mobile-menu-btn" className="btn-mobile-menu d-md-none">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      
+      <Header />
 
       {/*(Main Content) */}
       <main id="main-content">
@@ -186,7 +179,7 @@ function Home() {
                     <span className="material-symbols-outlined icon-gold">mail</span>
                     <div>
                       <h6 className="fw-bold m-0 text-white">Email</h6>
-                      <p className="m-0 text-light-blue ">chancellor@academicatelier.com</p>
+                      <p className="m-0 text-light-blue ">cellor@noa.com</p>
                     </div>
                   </div>
                   <div className="d-flex align-items-start gap-3">
@@ -199,63 +192,16 @@ function Home() {
                 </div>
               </div>
 
-              <div className="col-md-8 contact-form-panel p-5">
-                <form id="main-contact-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="row g-4 mb-4">
-                    <div className="col-md-6">
-                      <label htmlFor="input-name" className="form-label text-uppercase">Your Name</label>
-                      <input type="text" id="input-name" className="form-control custom-input" placeholder="Scholastic Full Name" />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="input-email" className="form-label text-uppercase">Email Address</label>
-                      <input type="email" id="input-email" className="form-control custom-input" placeholder="edu@university.com" />
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="select-interest" className="form-label text-uppercase">Academic Interest</label>
-                    <select id="select-interest" className="form-select custom-input">
-                      <option>Institutional Partnership</option>
-                      <option>General Inquiry</option>
-                      <option>Technical Support</option>
-                      <option>Media Relations</option>
-                    </select>
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="input-message" className="form-label text-uppercase">Your Message</label>
-                    <textarea id="input-message" rows="4" className="form-control custom-input" placeholder="How may we assist your academic journey?"></textarea>
-                  </div>
-                  <div className="text-end">
-                    <button type="submit" id="btn-submit-form" className="btn-primary-gradient d-inline-flex align-items-center gap-2">
-                      SEND DISPATCH <span className="material-symbols-outlined"></span>
-                    </button>
-                  </div>
-                </form>
-              </div>
+             
+                <ContactForm/>
+              
             </div>
           </div>
         </section>
       </main>
 
-      {/* 3.  Footer */}
-      <footer id="main-footer" className="site-footer border-top py-4">
-        <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
-          <div id="footer-branding" className="text-center text-md-start">
-            <p className="font-headline fw-bold mb-1 text-uppercase">study hub</p>
-            <p className="small text-muted m-0">© 2024 Study Hub . A Digital Sanctuary for Focus.</p>
-          </div>
-
-          <div className="d-flex flex-column flex-md-row align-items-center gap-4">
-            <nav id="footer-nav" className="d-flex gap-4">
-              <a href="#" className="footer-link">Privacy Policy</a>
-              <a href="#" className="footer-link">Terms of Service</a>
-              <a href="#" className="footer-link">Cookie Policy</a>
-            </nav>
-            <button id="btn-scroll-top" className="btn-scroll-top" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-              <span className="material-symbols-outlined">up</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+     
+      <Footer />
     </>
   );
 }

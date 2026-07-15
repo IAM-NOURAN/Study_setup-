@@ -183,6 +183,37 @@ body {
 .quote-content cite {
   color: var(--secondary-container) ;
 }
+
+/*delete button */
+.delete-task-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #a1a1aa; 
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.delete-task-btn:hover {
+  background-color: rgba(239, 68, 68, 0.08); 
+  color: #ef4444;
+  transform: scale(1.08); 
+}
+
+
+.delete-task-btn .delete-icon {
+  font-size: 1.25rem !important;
+}
+
+
+.task-row {
+  align-items: center !important; 
+}
 /* Custom Modal */
 .custom-modal-backdrop {
   position: fixed;

@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import "../styles/to do tasks.css";
+import Header from "../components/header";
+import Footer from "../components/footer";
+import { useAuth } from '../context/AuthContext';
 
 function Tasks() {
-  // 1. State to store the list of tasks (Initialized with the 4 default tasks from the design)
+  // 1. State to store the list of tasks (Initialized with the 4 default tasks)
   const [tasks, setTasks] = useState([
     { id: 1, title: "Finalize Research Methodology", desc: "Qualitative analysis section for the Semester Thesis", completed: true, active: true },
     { id: 2, title: "Review Bibliographic Citations", desc: "Ensure all APA 7th Edition formats are consistent", completed: false, active: false },
@@ -50,32 +53,21 @@ function Tasks() {
     setTasks(updatedTasks);
   };
 
+ 
+  const handleDeleteTask = (id) => {
+    const remainingTasks = tasks.filter(task => task.id !== id);
+    setTasks(remainingTasks);
+  };
+
   // Dynamic statistics calculations based on the current tasks array
   const totalTasks = tasks.length;
   const completedCount = tasks.filter(t => t.completed).length;
   const progressPercentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+   const { isLoggedIn } = useAuth();
 
   return (
     <>
-      {/* Header Section */}
-      <header id="main-header" className="site-header sticky-top">
-        <div className="container d-flex justify-content-between align-items-center py-3">
-          <div id="logo-container" className="d-flex align-items-center gap-2">
-            <span className="logo-text font-headline text-uppercase">study hub</span>
-            <span className="study-track-badge d-none d-md-inline-block text-uppercase">STUDY TRACK</span>
-          </div>
-          <nav id="main-nav" className="d-none d-md-flex align-items-center gap-4">
-            <Link to="/" className="nav-link">Home</Link>
-            <a href="#features-section" className="nav-link">Features</a>
-            <a href="#about-section" className="nav-link">About Us</a>
-            <a href="#contact-section" className="nav-link">Contact Us</a>
-            <Link to="/tasks" className="nav-link active">Study Resources</Link>
-          </nav>
-          <div id="header-actions" className="d-flex align-items-center gap-3">
-            <button id="login-btn" className="btn-login font-headline">Login</button>
-          </div>
-        </div>
-      </header>
+       <Header/>
 
       {/* Main Layout Container */}
       <div className="container my-5">
@@ -131,38 +123,51 @@ function Tasks() {
               
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="section-title font-headline m-0">Priority Objectives</h2>
-                {/* Triggers modal open on click */}
                 <button className="add-task-btn d-flex align-items-center gap-2" onClick={toggleModal}>
                   <span className="material-symbols-outlined">add_circle</span>
                   <span className="small-text fw-bold">Add New Task</span>
                 </button>
               </div>
 
-              {/* Dynamically rendering tasks array using JavaScript map */}
+              {/* Dynamically rendering tasks array */}
               <div className="d-flex flex-column gap-3">
                 {tasks.map((task) => (
                   <div 
                     key={task.id} 
-                    className={`task-row d-flex align-items-start gap-3 p-3 ${task.active ? 'active-task' : ''} ${task.completed ? 'completed-task' : ''}`}
+                    className={`task-row d-flex align-items-center justify-content-between gap-3 p-3 ${task.active ? 'active-task' : ''} ${task.completed ? 'completed-task' : ''}`}
                   >
-                    {/* Event handler to toggle checkbox state on click */}
-                    <div 
-                      className={`custom-checkbox mt-1 ${task.completed ? 'checked' : ''}`}
-                      onClick={() => toggleTaskCompletion(task.id)}
-                      style={{ cursor: 'pointer' }}
+                    <div className="d-flex align-items-start gap-3 flex-grow-1">
+                      {/* Checkbox */}
+                      <div 
+                        className={`custom-checkbox mt-1 ${task.completed ? 'checked' : ''}`}
+                        onClick={() => toggleTaskCompletion(task.id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {task.completed && <span className="material-symbols-outlined check-icon">check</span>}
+                      </div>
+                      
+                      {/* Task Info */}
+                      <div className="task-body">
+                        <h4 className="task-title font-headline m-0 mb-1" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
+                          {task.title}
+                        </h4>
+                        <p className="task-desc m-0 text-muted">{task.desc}</p>
+                      </div>
+                    </div>
+
+                    {/*delete button on right*/}
+                    <button 
+                      className="delete-task-btn d-flex align-items-center justify-content-center"
+                      onClick={() => handleDeleteTask(task.id)}
+                      title="Delete Task"
                     >
-                      {task.completed && <span className="material-symbols-outlined check-icon">check</span>}
-                    </div>
-                    <div className="task-body flex-grow-1">
-                      <h4 className="task-title font-headline m-0 mb-1" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-                        {task.title}
-                      </h4>
-                      <p className="task-desc m-0 text-muted">{task.desc}</p>
-                    </div>
+                      <span className="material-symbols-outlined delete-icon">delete</span>
+                    </button>
+
                   </div>
                 ))}
 
-                {/* Dotted Placeholder Row (Also acts as an add task trigger) */}
+                {/* Dotted Placeholder Row */}
                 <div className="task-placeholder d-flex flex-column align-items-center justify-content-center p-4 text-center mt-2" onClick={toggleModal} style={{ cursor: 'pointer' }}>
                   <span className="material-symbols-outlined placeholder-icon mb-2">add</span>
                   <span className="text-muted small">Capture a new intellectual task...</span>
@@ -184,7 +189,7 @@ function Tasks() {
         </div>
       </div>
       
-      {/* 5. Custom Popup Screen (Modal Window) */}
+      {/* Custom Popup Screen (Modal Window) */}
       {isModalOpen && (
         <div className="custom-modal-backdrop d-flex align-items-center justify-content-center">
           <div className="custom-modal-content p-4">
@@ -220,26 +225,7 @@ function Tasks() {
         </div>
       )}
 
-      {/* Footer Section */}
-      <footer id="main-footer" className="site-footer border-top py-4">
-        <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
-          <div id="footer-branding" className="text-center text-md-start">
-            <p className="font-headline fw-bold mb-1 text-uppercase">study hub</p>
-            <p className="small text-muted m-0">© 2024 Study Hub . A Digital Sanctuary for Focus.</p>
-          </div>
-
-          <div className="d-flex flex-column flex-md-row align-items-center gap-4">
-            <nav id="footer-nav" className="d-flex gap-4">
-              <a href="#" className="footer-link">Privacy Policy</a>
-              <a href="#" className="footer-link">Terms of Service</a>
-              <a href="#" className="footer-link">Cookie Policy</a>
-            </nav>
-            <button id="btn-scroll-top" className="btn-scroll-top" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-              <span className="material-symbols-outlined">up</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

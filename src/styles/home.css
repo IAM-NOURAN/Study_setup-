@@ -1,4 +1,4 @@
-/* =========================================  1. CSS Variables (Colors & Typography) ========================================= */
+/* =========================================   CSS Variables (Colors & Typography) ========================================= */
 :root {
     /* Colors */
     --primary: #002433;
@@ -24,7 +24,7 @@
     --font-body: 'Work Sans', sans-serif;
 }
 
-/* =========================================  2. Global Styles ========================================= */
+/* =========================================  Global Styles ========================================= */
 body {
     font-family: var(--font-body);
     background-color: var(--surface);
@@ -45,7 +45,7 @@ body {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* =========================================  3. Header & Navigationqq ========================================= */
+/* =========================================   Header & Navigationqq ========================================= */
 .site-header {
     background-color: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(16px);
@@ -95,7 +95,83 @@ body {
 .btn-login:hover { opacity: 0.8; }
 .btn-mobile-menu { background: none; border: none; color: var(--amber-200); }
 
-/* =========================================  4. Hero Section ========================================= */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.4); 
+    backdrop-filter: blur(4px);
+    z-index: 1040; 
+    transition: opacity 0.3s ease;
+}
+
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -380px; 
+    width: 280px;
+    height: 100vh;
+    background-color: #111827; 
+    border-right: 1px solid rgba(251, 223, 178, 0.1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    z-index: 1050; 
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+
+.mobile-sidebar.open {
+    left: 0;
+}
+
+
+.btn-close-sidebar {
+    background: none;
+    border: none;
+    color: var(--amber-200);
+    padding: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+
+.sidebar-link {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    transition: color 0.25s ease, padding-left 0.25s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-link:hover {
+    color: #fef3c7;
+    padding-left: 8px; 
+}
+
+
+.sidebar-link.active {
+    color: var(--amber-200);
+    border-left-color: var(--amber-200);
+    padding-left: 8px;
+}
+
+.sidebar-divider {
+    border-top: 1px solid rgba(251, 223, 178, 0.15);
+    margin: 1rem 0;
+}
+
+
+.login-sidebar-link {
+    color: var(--amber-200);
+    font-weight: 700;
+}
+
+/* =========================================   Hero Section ========================================= */
 .hero-section {
     min-height: 819px;
     background-color: var(--surface-container-low);
@@ -217,7 +293,7 @@ body {
     box-shadow: var(--editorial-shadow);
 }
 
-/* =========================================  5. Features  ========================================= */
+/* =========================================   Features  ========================================= */
 .section-title {
     font-size: 2.5rem;
     font-weight: 700;
@@ -238,14 +314,37 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.feature-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+.feature-title
+ {
+     font-size: 1.5rem;
+      font-weight: 700;
+       margin-bottom: 1rem;
+ }
 
-.light-card { background-color: var(--surface-container-low); color: var(--primary); }
-.light-card:hover { background-color: var(--surface-container); }
-.light-card .icon-highlight { font-size: 2.5rem; color: var(--secondary); }
+.light-card 
+{ 
+    background-color: var(--surface-container-low);
+     color: var(--primary);
+}
+.light-card:hover {
+     background-color: var(--surface-container);
+     }
+.light-card .icon-highlight 
+{ 
+    font-size: 2.5rem;
+     color: var(--secondary); 
+    
+  }
 
-.dark-card { background-color: var(--primary); }
-.dark-card .icon-light { font-size: 2.5rem; color: #fbdfb2; }
+.dark-card 
+{
+     background-color: var(--primary);
+     }
+.dark-card .icon-light 
+{ 
+    font-size: 2.5rem;
+     color: #fbdfb2; 
+ }
 .watermark-icon {
     position: absolute;
     bottom: -1rem;
@@ -255,10 +354,21 @@ body {
     color: white;
 }
 
-.gold-card { background-color: var(--secondary-container); color: var(--on-secondary-container); }
-.gold-card .icon-dark { font-size: 2.5rem; }
+.gold-card 
+{ 
+    background-color: var(--secondary-container); 
+    color: var(--on-secondary-container);
+ }
+.gold-card .icon-dark
+ { 
+    font-size: 2.5rem;
+ }
 
-.gray-card { background-color: var(--surface-container-highest); color: var(--primary); }
+.gray-card
+ {
+     background-color: var(--surface-container-highest);
+      color: var(--primary); 
+    }
 
 .feature-img { width: 16rem; height: 10rem; object-fit: cover; }
 
@@ -273,7 +383,7 @@ body {
 .avatar-stack img ~ img, .avatar-more { margin-left: -1rem; }
 .avatar-more { background-color: var(--primary); font-weight: 700; z-index: 10; }
 
-/* =========================================  6. About Us  ========================================= */
+/* =========================================   About Us  ========================================= */
 
 .about-section { background-color: var(--surface-container-low); }
 
@@ -306,9 +416,16 @@ body {
 }
 .library-img:hover { filter: grayscale(0%); }
 
-/* ======================================== 7. Contact Form  ========================================= */
+/* ========================================  Contact Form  ========================================= */
+.font-headline {
+    text-align: center;
+    
+}
+.contact-wrapper {
 
-.contact-wrapper { background-color: var(--surface-container-highest); }
+     background-color: var(--surface-container-highest);
+    
+    }
 
 .contact-info-panel { background-color: var(--primary); }
 .icon-gold { color: #fbdfb2; }
@@ -330,13 +447,14 @@ body {
     color: var(--on-surface);
 }
 
+
 .custom-input:focus {
     box-shadow: 0 0 0 2px var(--primary);
     outline: none;
     background-color: var(--surface-container-low);
 }
 
-/* =========================================  8. Footer  ========================================= */
+/* =========================================   Footer  ========================================= */
 .site-footer { background-color: #fffaf0; }
 
 .footer-link {

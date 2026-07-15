@@ -129,6 +129,7 @@ function NavBar() {
             >
               {item.label}
             </Link>
+             
           ))}
         </nav>
       </div>
