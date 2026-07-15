@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom'; // 1. استيراد useLocation
+import { Link, useLocation } from 'react-router-dom'; 
 import { useAuth } from '../context/AuthContext';
 import  '../styles/home.css';
 
@@ -39,7 +39,7 @@ function Header() {
           
           <Link to="/tasks" className="nav-link">Study Resources</Link>
           
-          <Link to={isLoggedIn ? "/profile" : "/auth/signup"} className="nav-link">
+          <Link to={isLoggedIn ? "/profile" : "/signup"} className="nav-link">
             My Profile
           </Link>
         </nav>
