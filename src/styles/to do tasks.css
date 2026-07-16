@@ -35,7 +35,7 @@ body {
   font-family: var(--font-body);
 }
 
-/* عناوين الصفحة الرئيسية */
+
 .sub-title {
   color: var(--secondary);
   font-family: var(--font-headline);
@@ -44,11 +44,12 @@ body {
   font-weight: 600;
 }
 
-.main-title {
+.main-task-title {
   font-size: 2.75rem;
   color: var(--primary);
   font-family: var(--font-headline);
   font-weight: 700;
+  text-align: left;
 }
 
 .description-text {

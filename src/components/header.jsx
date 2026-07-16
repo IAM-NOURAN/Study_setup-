@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/home.css';
+import { NavLink } from 'react-router-dom';
 
 function Header() {
   const { isLoggedIn } = useAuth();
@@ -28,24 +29,38 @@ function Header() {
           <span className="study-track-badge d-none d-md-inline-block text-uppercase">STUDY TRACK</span>
         </div>
 
+     <nav id="main-nav" className="d-none d-md-flex align-items-center gap-4">
+  
+      <NavLink 
+        to="/" 
+        end 
+       className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+      >
+       Home
+      </NavLink>
 
-        <nav id="main-nav" className="d-none d-md-flex align-items-center gap-4">
-          <Link to="/" className="nav-link active">Home</Link>
+  
+  <a href={getSectionLink("features-section")} className="nav-link">Features</a>
+  <a href={getSectionLink("about-section")} className="nav-link">About Us</a>
+  <a href={getSectionLink("contact-section")} className="nav-link">Contact Us</a>
 
+  
+       <NavLink 
+        to="/tasks" 
+        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        >
+        To-Do List
+       </NavLink>
 
-          <a href={getSectionLink("features-section")} className="nav-link">Features</a>
-          <a href={getSectionLink("about-section")} className="nav-link">About Us</a>
-          <a href={getSectionLink("contact-section")} className="nav-link">Contact Us</a>
-
-          <Link to="/tasks" className="nav-link">To-Do List</Link>
-
-          <Link to={isLoggedIn ? "/profile" : "/signup"} className="nav-link">
-            My Profile
-          </Link>
-          {/* <Link to= "/profile" className="nav-link">
-            My Profile
-          </Link> */}
-        </nav>
+  
+       <NavLink 
+          to={isLoggedIn ? "/profile" : "/signup"} 
+          className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+         >
+       My Profile
+       </NavLink>
+       
+      </nav>
 
         <div id="header-actions" className="d-flex align-items-center gap-3">
 

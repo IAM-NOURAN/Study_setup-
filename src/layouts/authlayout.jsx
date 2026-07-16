@@ -1,7 +1,15 @@
 import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link,Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function AuthLayout() {
+  const { isLoggedIn } = useAuth();
+
+ 
+  if (isLoggedIn) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <>
    
@@ -10,7 +18,7 @@ function AuthLayout() {
         .auth-layout-wrapper {
           min-height: 100vh;
           position: relative;
-          background-color: var(--surface); /* متناسق مع ألوانكِ العاجية */
+          background-color: var(--surface); 
         }
 
       

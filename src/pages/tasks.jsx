@@ -1,49 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import "../styles/to do tasks.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import TaskModal from "../components/TaskModal"; 
 import { useAuth } from '../context/AuthContext';
 
 function Tasks() {
-  // 1. State to store the list of tasks (Initialized with the 4 default tasks)
-  const [tasks, setTasks] = useState([
+  const { isLoggedIn } = useAuth();
+
+  const defaultTasks = [
     { id: 1, title: "Finalize Research Methodology", desc: "Qualitative analysis section for the Semester Thesis", completed: true, active: true },
     { id: 2, title: "Review Bibliographic Citations", desc: "Ensure all APA 7th Edition formats are consistent", completed: false, active: false },
-  ]);
+  ];
 
-  // 2. State to control the visibility of the popup screen (Modal)
+  const [tasks, setTasks] = useState(() => {
+    if (isLoggedIn) {
+      const savedTasks = localStorage.getItem("studyhub_tasks");
+      return savedTasks ? JSON.parse(savedTasks) : defaultTasks;
+    }
+    return defaultTasks;
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 3. States to handle user input inside the form fields
-  const [newTitle, setNewTitle] = useState("");
-  const [newDesc, setNewDesc] = useState("");
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem("studyhub_tasks", JSON.stringify(tasks));
+    }
+  }, [tasks, isLoggedIn]);
 
-  // Function to toggle modal visibility and reset input fields
+  useEffect(() => {
+    if (isLoggedIn) {
+      const savedTasks = localStorage.getItem("studyhub_tasks");
+      setTasks(savedTasks ? JSON.parse(savedTasks) : defaultTasks);
+    } else {
+      setTasks(defaultTasks);
+    }
+  }, [isLoggedIn]);
+
+  // Toggle modal only (Inputs states are now inside the Modal itself)
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-    setNewTitle("");
-    setNewDesc("");
   };
 
-  // Function to save the new task and append it to the tasks state array
-  const handleSaveTask = (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return; // Prevent adding an empty objective title
-
+  // Receives title and desc directly from the Modal component
+  const handleSaveTask = (title, desc) => {
     const newTask = {
-      id: Date.now(), // Unique identifier using current timestamp
-      title: newTitle,
-      desc: newDesc,
+      id: Date.now(),
+      title: title,
+      desc: desc,
       completed: false,
       active: false
     };
 
-    setTasks([...tasks, newTask]); // Append the new task to the previous list
-    toggleModal(); // Close the popup window
+    setTasks([...tasks, newTask]);
+    toggleModal(); // Close the modal
   };
 
-  // Function to toggle task completion status (Checked / Unchecked)
   const toggleTaskCompletion = (id) => {
     const updatedTasks = tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
@@ -51,36 +65,38 @@ function Tasks() {
     setTasks(updatedTasks);
   };
 
- 
   const handleDeleteTask = (id) => {
     const remainingTasks = tasks.filter(task => task.id !== id);
     setTasks(remainingTasks);
   };
 
-  // Dynamic statistics calculations based on the current tasks array
   const totalTasks = tasks.length;
   const completedCount = tasks.filter(t => t.completed).length;
   const progressPercentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
-   const { isLoggedIn } = useAuth();
+
+
 
   return (
     <>
-       <Header/>
+      <Header/>
 
-      {/* Main Layout Container */}
       <div className="container my-5">
         <div id="page-hero" className="mb-5">
           <span className="sub-title text-uppercase font-headline">personal sanctuary</span>
-          <h1 className="main-title font-headline text-capitalize mt-1">Study Hub</h1>
-          <p className="description-text mt-2">Organize your intellectual pursuits with precision. Your daily academic architecture begins here.</p>
+          <h1 className="main-task-title font-headline text-capitalize mt-1">Study Hub</h1>
+          <p className="description-text mt-2">
+            Organize your intellectual pursuits with precision. Your daily academic architecture begins here.
+            {!isLoggedIn && (
+              <span className="d-block text-warning small mt-2 fw-bold">
+                ⚠️ You are in Guest Mode. Your changes won't be saved unless you log in.
+              </span>
+            )}
+          </p>
         </div>
 
         <div className="row g-4">
-          {/* Aside Column (Left Side) */}
           <aside className="col-12 col-lg-4">
             <div className="d-flex flex-column gap-4">
-              
-              {/* Today's Focus Card (Dynamic progress) */}
               <div className="focus-card p-4">
                 <h3 className="card-heading font-headline mb-4">Today's Focus</h3>
                 <div className="d-flex align-items-center gap-3 mb-4">
@@ -98,7 +114,6 @@ function Tasks() {
                 </div>
               </div>
 
-              {/* Reading List Card */}
               <div className="reading-card p-4">
                 <h3 className="card-heading font-headline mb-3">Reading List</h3>
                 <ul className="list-unstyled d-flex flex-column gap-3 m-0">
@@ -115,7 +130,6 @@ function Tasks() {
             </div>
           </aside>
 
-          {/* Main Content Column (Right Side) */}
           <main className="col-12 col-lg-8">
             <div className="tasks-container p-4 h-100">
               
@@ -127,7 +141,6 @@ function Tasks() {
                 </button>
               </div>
 
-              {/* Dynamically rendering tasks array */}
               <div className="d-flex flex-column gap-3">
                 {tasks.map((task) => (
                   <div 
@@ -135,7 +148,6 @@ function Tasks() {
                     className={`task-row d-flex align-items-center justify-content-between gap-3 p-3 ${task.active ? 'active-task' : ''} ${task.completed ? 'completed-task' : ''}`}
                   >
                     <div className="d-flex align-items-start gap-3 flex-grow-1">
-                      {/* Checkbox */}
                       <div 
                         className={`custom-checkbox mt-1 ${task.completed ? 'checked' : ''}`}
                         onClick={() => toggleTaskCompletion(task.id)}
@@ -144,7 +156,6 @@ function Tasks() {
                         {task.completed && <span className="material-symbols-outlined check-icon">check</span>}
                       </div>
                       
-                      {/* Task Info */}
                       <div className="task-body">
                         <h4 className="task-title font-headline m-0 mb-1" style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
                           {task.title}
@@ -153,7 +164,6 @@ function Tasks() {
                       </div>
                     </div>
 
-                    {/*delete button on right*/}
                     <button 
                       className="delete-task-btn d-flex align-items-center justify-content-center"
                       onClick={() => handleDeleteTask(task.id)}
@@ -161,18 +171,15 @@ function Tasks() {
                     >
                       <span className="material-symbols-outlined delete-icon">delete</span>
                     </button>
-
                   </div>
                 ))}
 
-                {/* Dotted Placeholder Row */}
                 <div className="task-placeholder d-flex flex-column align-items-center justify-content-center p-4 text-center mt-2" onClick={toggleModal} style={{ cursor: 'pointer' }}>
                   <span className="material-symbols-outlined placeholder-icon mb-2">add</span>
                   <span className="text-muted small">Capture a new intellectual task...</span>
                 </div>
               </div>
 
-              {/* Quote Banner */}
               <div className="quote-banner mt-4 p-4 d-flex flex-column justify-content-end position-relative overflow-hidden rounded-3">
                 <div className="quote-content position-relative z-1 text-white">
                   <q className="fs-5 fw-normal lh-base mb-2 d-block">
@@ -187,40 +194,9 @@ function Tasks() {
         </div>
       </div>
       
-      {/* Custom Popup Screen (Modal Window) */}
+      // Render TaskModal only when isModalOpen is true
       {isModalOpen && (
-        <div className="custom-modal-backdrop d-flex align-items-center justify-content-center">
-          <div className="custom-modal-content p-4">
-            <h3 className="font-headline mb-3 text-dark-blue">Create Intellectual Task</h3>
-            <form onSubmit={handleSaveTask}>
-              <div className="mb-3">
-                <label className="form-label text-uppercase small fw-bold">Objective Title</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="e.g. Finalize Chapter 3"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  required 
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label text-uppercase small fw-bold">Description / Context</label>
-                <textarea 
-                  className="form-control" 
-                  rows="3"
-                  placeholder="Provide scholastic context..."
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                ></textarea>
-              </div>
-              <div className="d-flex justify-content-end gap-2 mt-4">
-                <button type="button" className="btn btn-light" onClick={toggleModal}>Cancel</button>
-                <button type="submit" className="btn btn-dark-blue px-4 text-white" style={{ backgroundColor: 'var(--primary)' }}>Save Objective</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <TaskModal onClose={toggleModal} onSave={handleSaveTask} />
       )}
 
       <Footer />

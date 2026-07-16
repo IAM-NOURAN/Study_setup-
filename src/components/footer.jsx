@@ -18,9 +18,16 @@ function Footer() {
               <a href="#" className="footer-link">Terms of Service</a>
               <a href="#" className="footer-link">Cookie Policy</a>
             </nav>
-            <button id="btn-scroll-top" className="btn-scroll-top" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-              <span className="material-symbols-outlined">up</span>
-            </button>
+            <button 
+               id="btn-scroll-top" 
+               className="btn-scroll-top" 
+               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+               title="Scroll to top"
+              >
+ 
+             <span className="material-symbols-outlined">arrow_upward</span>
+             </button>
+
           </div>
         </div>
       </footer>
