@@ -14,8 +14,6 @@ This project is a modern, client-side React application scaffolded with Vite for
 
 **Target users:** Developers who want to run, extend, or deploy this front-end application, as well as end users who will interact with it through a browser (e.g., students, visitors, or clients depending on the site's specific content).
 
-> Note: The repository's own README currently contains the default Vite + React template text rather than project-specific documentation — this README replaces it with setup and usage instructions derived from the codebase's configuration files.
-
 ## 💻 System Requirements
 
 - **Node.js**: v18 or higher recommended (required by Vite 5 and the React 18 toolchain used in this project)
@@ -34,25 +32,13 @@ npm install
 ```
 
 ## ⚙️ Configuration Instructions
-
-No `.env` file or `process.env` usage was found in the project's configuration files at the time of writing, so **no environment variables are required to install and run the app out of the box**.
+ **no environment variables are required to install and run the app out of the box**.
 
 However, this project depends on `@emailjs/browser`, which is typically used to send emails from the client and usually requires an **EmailJS Service ID, Template ID, and Public Key**. If a contact/email feature is present:
 
-- Check the source code (e.g., inside `src/`) for where `emailjs.send(...)` or `emailjs.init(...)` is called — the IDs/keys may be hardcoded there rather than pulled from environment variables.
-- If you'd like to secure these credentials instead of hardcoding them, you can create a `.env` file in the project root and reference the values with Vite's `import.meta.env.VITE_*` convention, for example:
-
-```env
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
-```
-
-(Remember: any variable exposed to Vite's client bundle must be prefixed with `VITE_`.)
-
 ## ▶️ Execution Guide
 
-**Development mode** (starts a local dev server with hot module replacement):
+**Development mode** :
 ```bash
 npm run dev
 ```
@@ -76,7 +62,7 @@ npm run lint
 
 After running `npm run build`, the deployable static assets are generated in the `dist/` folder. This folder can be uploaded to any static hosting provider (Vercel, Netlify, GitHub Pages, etc.).
 
-**Deployment Link:** *[Add your live deployment URL here once hosted, e.g., on Vercel or Netlify]*
+**Deployment Link:** *[]*
 
 ## 📦 Package Manager
 
