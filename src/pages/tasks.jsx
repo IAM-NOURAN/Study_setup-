@@ -7,38 +7,39 @@ import TaskModal from "../components/TaskModal";
 import { useAuth } from '../context/AuthContext';
 
 function Tasks() {
-  // 1. Get authentication state
+  // Get authentication state
   const { isLoggedIn, user } = useAuth();
-
-  // 2. Get current user ID
   const userId = user?.id || user?.uid || "guest";
   const storageKey = `studyhub_tasks_${userId}`;
- 
-  console.log("1. Current User ID:", userId);
-  console.log("2. Is Logged In?:", isLoggedIn);
-  console.log("3. Current Storage Key:", storageKey);
-  console.log("4. LocalStorage Has Data?:", localStorage.getItem(storageKey) !== null);
- 
 
+  // Default tasks for guests
   const defaultTasks = [
     { id: 1, title: "Finalize Research Methodology", desc: "Qualitative analysis section for the Semester Thesis", completed: true, active: true },
     { id: 2, title: "Review Bibliographic Citations", desc: "Ensure all APA 7th Edition formats are consistent", completed: false, active: false },
   ];
 
-  // 3. Load tasks directly on initial render 
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem(storageKey);
-    return savedTasks ? JSON.parse(savedTasks) : defaultTasks;
-  });
-
+  // Initialize state
+  const [tasks, setTasks] = useState(defaultTasks);
+  const [loadedKey, setLoadedKey] = useState(""); // Track currently loaded storage key to prevent overwrites
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 4. Save tasks to localStorage ONLY when they actually change
+  // Load tasks whenever the storage key changes
   useEffect(() => {
-    if (isLoggedIn && userId !== "guest") {
+    const savedTasks = localStorage.getItem(storageKey);
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    } else {
+      setTasks(defaultTasks);
+    }
+    setLoadedKey(storageKey); // Mark this key as loaded
+  }, [storageKey]);
+
+  // Save tasks only after the correct key has finished loading
+  useEffect(() => {
+    if (loadedKey === storageKey && isLoggedIn && userId !== "guest") {
       localStorage.setItem(storageKey, JSON.stringify(tasks));
     }
-  }, [tasks, isLoggedIn, storageKey]);
+  }, [tasks, storageKey, loadedKey, isLoggedIn, userId]);
 
   // Toggle modal visibility
   const toggleModal = () => {
