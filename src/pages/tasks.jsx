@@ -3,48 +3,49 @@ import { Link } from 'react-router-dom';
 import "../styles/to do tasks.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import TaskModal from "../components/TaskModal"; 
+import TaskModal from "../components/TaskModal";
 import { useAuth } from '../context/AuthContext';
 
 function Tasks() {
-  const { isLoggedIn } = useAuth();
+  // 1. Get authentication state
+  const { isLoggedIn, user } = useAuth();
+
+  // 2. Get current user ID
+  const userId = user?.id || user?.uid || "guest";
+  const storageKey = `studyhub_tasks_${userId}`;
+ 
+  console.log("1. Current User ID:", userId);
+  console.log("2. Is Logged In?:", isLoggedIn);
+  console.log("3. Current Storage Key:", storageKey);
+  console.log("4. LocalStorage Has Data?:", localStorage.getItem(storageKey) !== null);
+ 
 
   const defaultTasks = [
     { id: 1, title: "Finalize Research Methodology", desc: "Qualitative analysis section for the Semester Thesis", completed: true, active: true },
     { id: 2, title: "Review Bibliographic Citations", desc: "Ensure all APA 7th Edition formats are consistent", completed: false, active: false },
   ];
 
+  // 3. Load tasks directly on initial render 
   const [tasks, setTasks] = useState(() => {
-    if (isLoggedIn) {
-      const savedTasks = localStorage.getItem("studyhub_tasks");
-      return savedTasks ? JSON.parse(savedTasks) : defaultTasks;
-    }
-    return defaultTasks;
+    const savedTasks = localStorage.getItem(storageKey);
+    return savedTasks ? JSON.parse(savedTasks) : defaultTasks;
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // 4. Save tasks to localStorage ONLY when they actually change
   useEffect(() => {
-    if (isLoggedIn) {
-      localStorage.setItem("studyhub_tasks", JSON.stringify(tasks));
+    if (isLoggedIn && userId !== "guest") {
+      localStorage.setItem(storageKey, JSON.stringify(tasks));
     }
-  }, [tasks, isLoggedIn]);
+  }, [tasks, isLoggedIn, storageKey]);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      const savedTasks = localStorage.getItem("studyhub_tasks");
-      setTasks(savedTasks ? JSON.parse(savedTasks) : defaultTasks);
-    } else {
-      setTasks(defaultTasks);
-    }
-  }, [isLoggedIn]);
-
-  // Toggle modal only (Inputs states are now inside the Modal itself)
+  // Toggle modal visibility
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  // Receives title and desc directly from the Modal component
+  // Add a new task
   const handleSaveTask = (title, desc) => {
     const newTask = {
       id: Date.now(),
@@ -55,9 +56,10 @@ function Tasks() {
     };
 
     setTasks([...tasks, newTask]);
-    toggleModal(); // Close the modal
+    toggleModal();
   };
 
+  // Toggle task completion status
   const toggleTaskCompletion = (id) => {
     const updatedTasks = tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
@@ -65,16 +67,16 @@ function Tasks() {
     setTasks(updatedTasks);
   };
 
+  // Delete a task
   const handleDeleteTask = (id) => {
     const remainingTasks = tasks.filter(task => task.id !== id);
     setTasks(remainingTasks);
   };
 
+  // Calculate task progress metrics
   const totalTasks = tasks.length;
   const completedCount = tasks.filter(t => t.completed).length;
   const progressPercentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
-
-
 
   return (
     <>
@@ -194,7 +196,6 @@ function Tasks() {
         </div>
       </div>
       
-      // Render TaskModal only when isModalOpen is true
       {isModalOpen && (
         <TaskModal onClose={toggleModal} onSave={handleSaveTask} />
       )}
