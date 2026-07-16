@@ -72,8 +72,6 @@ export default function Login() {
 
             login(user);
 
-            localStorage.setItem("user", JSON.stringify(user));
-
             console.log(user);
 
             navigate("/");
