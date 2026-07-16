@@ -4,6 +4,7 @@ import { z } from "zod";
 import "../styles/auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Enter a valid email"),
@@ -23,6 +24,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+
+    const { login } = useAuth();
 
 
     async function handleSubmit(e) {
@@ -66,6 +69,8 @@ export default function Login() {
 
                 return;
             }
+
+            login(user);
 
             localStorage.setItem("user", JSON.stringify(user));
 

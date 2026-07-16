@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom'; 
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import  '../styles/home.css';
+import '../styles/home.css';
 
 function Header() {
   const { isLoggedIn } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
- 
-  const location = useLocation(); 
+
+
+  const location = useLocation();
   const isHomePage = location.pathname === "/";
 
   const toggleMenu = () => {
@@ -28,17 +28,17 @@ function Header() {
           <span className="study-track-badge d-none d-md-inline-block text-uppercase">STUDY TRACK</span>
         </div>
 
-        
+
         <nav id="main-nav" className="d-none d-md-flex align-items-center gap-4">
           <Link to="/" className="nav-link active">Home</Link>
-          
-       
+
+
           <a href={getSectionLink("features-section")} className="nav-link">Features</a>
           <a href={getSectionLink("about-section")} className="nav-link">About Us</a>
           <a href={getSectionLink("contact-section")} className="nav-link">Contact Us</a>
-          
+
           <Link to="/tasks" className="nav-link">To-Do List</Link>
-          
+
           <Link to={isLoggedIn ? "/profile" : "/signup"} className="nav-link">
             My Profile
           </Link>
@@ -48,10 +48,16 @@ function Header() {
         </nav>
 
         <div id="header-actions" className="d-flex align-items-center gap-3">
-          
-          <Link to="/login" id="login-btn" className="btn-login font-headline text-decoration-none d-inline-flex align-items-center justify-content-center">
-            Login
-          </Link>
+
+          {!isLoggedIn && (
+            <Link
+              to="/login"
+              id="login-btn"
+              className="btn-login font-headline text-decoration-none d-inline-flex align-items-center justify-content-center"
+            >
+              Login
+            </Link>
+          )}
           <button id="mobile-menu-btn" className="btn-mobile-menu d-md-none" onClick={toggleMenu}>
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -70,17 +76,25 @@ function Header() {
 
         <nav className="sidebar-nav d-flex flex-column gap-3 p-4">
           <Link to="/" className="sidebar-link active" onClick={toggleMenu}>Home</Link>
-          
-         
+
+
           <a href={getSectionLink("features-section")} className="sidebar-link" onClick={toggleMenu}>Features</a>
           <a href={getSectionLink("about-section")} className="sidebar-link" onClick={toggleMenu}>About Us</a>
           <a href={getSectionLink("contact-section")} className="sidebar-link" onClick={toggleMenu}>Contact Us</a>
-          
+
           <Link to="/tasks" className="sidebar-link" onClick={toggleMenu}>To-Do List</Link>
           <Link to={isLoggedIn ? "/profile" : "/signup"} className="sidebar-link" onClick={toggleMenu}>My Profile</Link>
-          
+
           <hr className="sidebar-divider" />
-          <Link to="/login" className="sidebar-link login-sidebar-link" onClick={toggleMenu}>Login</Link>
+          {!isLoggedIn && (
+            <Link
+              to="/login"
+              className="sidebar-link login-sidebar-link"
+              onClick={toggleMenu}
+            >
+              Login
+            </Link>
+          )}
         </nav>
       </div>
     </header>
